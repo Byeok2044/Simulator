@@ -1,0 +1,26 @@
+# Operating System Junk Files
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# IDE & Code Editor Folders
+.vscode/
+.idea/
+*.swp
+
+# Vendor folder (In case you install Composer libraries later)
+/vendor/
+composer.phar
+
+# User File Uploads & Datasets
+# Prevents giant CSV/Excel files uploaded by users during testing from cluttering Git
+/uploads/
+*.tmp
+
+# Environment & Secret Files (In case you use config/env files later)
+.env
+config.local.php
+
+# Log Files
+*.log
