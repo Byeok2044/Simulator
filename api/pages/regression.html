@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Linear Regression Simulator</title>
+    <link rel="stylesheet" href="?asset=styles">
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow one"></div>
+    <div class="bg-glow two"></div>
+    <div class="bg-glow three"></div>
+    <div class="scanlines"></div>
+
+<div class="container">
+    <header><h1>Linear Regression</h1><p class="help">Explore your data, fit a line, and inspect the differences.</p></header>
+    <!-- EACH errors -->
+<div class="error-box" role="alert">{{message}}</div>
+<!-- END errors -->
+    <form method="post" enctype="multipart/form-data" id="regression-form">
+        <input type="hidden" name="points" value="{{points}}">
+        <input type="hidden" name="page" value="{{page}}">
+        <input type="hidden" name="zoom" value="{{zoom}}">
+        <input type="hidden" name="csv_source" value="{{csv_source}}">
+        <div class="card">
+            <h2>Data</h2>
+            <!-- IF notice -->
+<p class="status" role="status">{{notice}}</p>
+<!-- END notice -->
+            <div class="import-panel">
+                <label for="csv-file">Import a CSV file</label>
+                <p class="help">PHP reads your uploaded CSV and validates the selected columns. Up to 5,000 points / 2 MB. Choose a file, preview it, then import your X and Y columns.</p>
+                <input type="file" id="csv-file" name="csv_file" accept=".csv,text/csv,.tsv,text/tab-separated-values">
+                <div class="controls">
+                    <label>Separator <select name="delimiter"><!-- EACH delimiter_options -->
+<option value="{{value}}" {{selected}}>{{text}}</option>
+<!-- END delimiter_options --></select></label>
+                    <label><input type="checkbox" name="csv_header" {{csv_header_checked}}> First record contains headers</label>
+                    <button name="action" value="preview_csv">Preview CSV</button>
+                    <button name="action" value="sample_csv">Download sample CSV</button>
+                </div>
+                <!-- IF has_csv -->
+<div class="controls">
+    <label>X column <select name="csv_x"><!-- EACH csv_x_options -->
+<option value="{{value}}" {{selected}}>{{text}}</option>
+<!-- END csv_x_options --></select></label>
+    <label>Y column <select name="csv_y"><!-- EACH csv_y_options -->
+<option value="{{value}}" {{selected}}>{{text}}</option>
+<!-- END csv_y_options --></select></label>
+    <label><input type="checkbox" name="csv_skip" {{skip_checked}}> Skip invalid records</label>
+</div>
+<p class="help">{{record_count}} data records. Preview of the first three records; column numbers match the selectors.</p>
+<div class="table-scroll"><table><thead><tr><!-- EACH csv_headings -->
+<th>{{text}}</th>
+<!-- END csv_headings --></tr></thead><tbody><!-- EACH csv_preview_rows -->
+<tr><!-- EACH cells -->
+<td>{{text}}</td>
+<!-- END cells --></tr><!-- END csv_preview_rows --></tbody></table></div>
+<div class="actions"><button name="action" value="import_csv">Replace table with CSV data</button></div>
+<!-- END has_csv -->
+            </div>
+            <div class="controls">
+                <label>X axis <input type="text" name="axis_x" maxlength="80" value="{{axis_x}}"></label>
+                <label>Y axis <input type="text" name="axis_y" maxlength="80" value="{{axis_y}}"></label>
+            </div>
+            <p class="help">{{row_count}} rows · Page {{page_number}} of {{page_count}}. Changes on this page are saved when you use any button.</p>
+            <div class="table-scroll"><table id="data-table">
+                <thead><tr><th>Row</th><th>X</th><th>Y</th><th></th></tr></thead>
+                <tbody><!-- EACH rows -->
+<tr>
+    <td class="row-num">{{number}}</td>
+    <td><input type="text" inputmode="decimal" name="edit[{{index}}][0]" maxlength="160" aria-label="X value, row {{number}}" value="{{x}}"></td>
+    <td><input type="text" inputmode="decimal" name="edit[{{index}}][1]" maxlength="160" aria-label="Y value, row {{number}}" value="{{y}}"></td>
+    <td><button name="action" value="remove_{{index}}" class="remove-row" {{remove_disabled}}>Remove</button></td>
+</tr>
+<!-- END rows --></tbody>
+            </table></div>
+            <div class="actions">
+                <button name="action" value="previous" {{previous_disabled}}>Previous page</button>
+                <button name="action" value="next" {{next_disabled}}>Next page</button>
+                <button name="action" value="add" {{add_disabled}}>+ Add Row</button>
+                <button name="action" value="sample" class="btn-sample">Sample Data</button>
+                <button name="action" value="run" class="btn-primary">Run</button>
+            </div>
+            <p class="help">Use numeric X and Y values in each row, including decimals or scientific notation. Run fits all pages.</p>
+        </div>
+        <!-- IF has_results -->
+<div class="card">
+    <h2>Results</h2>
+    <div class="equation">y = {{slope}}x {{sign}} {{intercept}}</div>
+    <div class="results"><!-- EACH stats -->
+<div class="stat"><div class="label">{{label}}</div><div class="value">{{value}}</div></div>
+<!-- END stats --></div>
+    <!-- IF constant_y -->
+<p class="help">Correlation and R-squared are undefined because all Y values are identical.</p>
+<!-- END constant_y -->
+    <div class="controls"><label>Predict Y for X <input type="text" inputmode="decimal" name="predict_x" value="{{predict_x}}" placeholder="Enter X"></label><button name="action" value="predict">Predict</button><output class="help">{{prediction}}</output></div>
+</div>
+<div class="card">
+    <h2>Plot</h2>
+    <input type="hidden" name="plot_options" value="1">
+    <div class="controls">
+        <label>View <select name="mode"><!-- EACH mode_options -->
+<option value="{{value}}" {{selected}}>{{text}}</option>
+<!-- END mode_options --></select></label>
+        <!-- EACH checkboxes -->
+<label><input type="checkbox" name="{{name}}" {{checked}}> {{text}}</label>
+<!-- END checkboxes -->
+        <button name="action" value="update_plot">Update plot</button>
+        <button name="action" value="zoom_in" {{zoom_in_disabled}}>Zoom +</button>
+        <button name="action" value="zoom_out" {{zoom_out_disabled}}>Zoom −</button>
+        <button name="action" value="reset_plot">Reset view</button>
+        <button name="action" value="download_plot">Download SVG</button>
+    </div>
+    <div class="legend"><span>Observations</span><span class="fit">Fitted line</span><span class="res">Residual / zero reference</span></div>
+    <p class="help">Hover a point for its values. Residual = observed Y − predicted Y. Plot controls recalculate using your current data.</p>
+    <div class="chart-wrap">{{{chart}}}</div>
+    <p class="status" role="status">{{plot_status}}</p>
+</div>
+<!-- END has_results --><!-- IF no_results -->
+<div class="card"><h2>Plot</h2><div class="empty-chart">Enter or import data, then run the model.</div></div>
+<!-- EACH hidden_state -->
+<input type="hidden" name="{{name}}" value="{{value}}">
+<!-- END hidden_state -->
+<!-- END no_results -->
+    </form>
+</div>
+</body>
+</html>

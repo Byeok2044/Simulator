@@ -1,0 +1,10 @@
+text{font-family:Consolas,monospace}
+.grid{stroke:#233347;stroke-width:1}
+.tick{fill:#a2b5c8;font-size:11px}
+.axis{stroke:#537089;stroke-width:1.5}
+.axis-label{fill:#00e5ff;font-size:13px}
+.point{fill:#00e5ff;stroke:#05070d;stroke-width:1.5}
+.reg-line{stroke:#ff2e88;stroke-width:3}
+.residual{stroke:#ffcd70;stroke-width:1;stroke-dasharray:4 4;opacity:.7}
+.zero{stroke:#ffcd70;stroke-width:1.5}
+

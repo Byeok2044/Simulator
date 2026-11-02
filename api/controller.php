@@ -1,0 +1,109 @@
+<?php
+require_once __DIR__ . '/regression.php';
+require_once __DIR__ . '/csv.php';
+require_once __DIR__ . '/plot.php';
+
+function h($value): string { return htmlspecialchars((string)$value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
+function postText(string $key, string $default = ''): string { return is_string($_POST[$key] ?? null) ? $_POST[$key] : $default; }
+function label(string $value): string {
+    $value = trim($value);
+    return $value === '' ? 'Value' : (preg_match('//u', $value) === 1 ? implode('', array_slice(preg_split('//u', $value, -1, PREG_SPLIT_NO_EMPTY), 0, 80)) : 'Value');
+}
+
+$errors = []; $notice = ''; $result = null; $chart = ''; $plotStatus = ''; $prediction = '';
+$pairs = [['', ''], ['', '']]; $page = 0; $pageSize = 100;
+$action = postText('action', 'run');
+$axisX = label(postText('axis_x', 'X')); $axisY = label(postText('axis_y', 'Y'));
+$csvText = ''; $csvRows = []; $delimiter = postText('delimiter', ',');
+if (!in_array($delimiter, [',', ';', 'tab'], true)) $delimiter = ',';
+$hasHeader = isset($_POST['csv_header']); $skipInvalid = isset($_POST['csv_skip']);
+$xColumn = max(0, (int)postText('csv_x', '0')); $yColumn = max(0, (int)postText('csv_y', '1'));
+$zoomValue = postText('zoom', '1');
+$zoom = validNumber($zoomValue) ? max(.5, min(8, (float)$zoomValue)) : 1;
+if ($action === 'zoom_in') $zoom = min(8, $zoom * 1.5);
+if ($action === 'zoom_out') $zoom = max(.5, $zoom / 1.5);
+if ($action === 'reset_plot') $zoom = 1;
+$options = ['mode' => postText('mode') === 'residual' ? 'residual' : 'fit', 'zoom' => $zoom,
+    'line' => !isset($_POST['plot_options']) || isset($_POST['show_line']),
+    'grid' => !isset($_POST['plot_options']) || isset($_POST['show_grid']),
+    'residuals' => isset($_POST['show_residuals']), 'axisX' => $axisX, 'axisY' => $axisY];
+$predictX = postText('predict_x');
+
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+    try {
+        if (empty($_POST) && !empty($_SERVER['CONTENT_LENGTH'])) throw new InvalidArgumentException('The submitted data exceeds the server upload limit. Choose a smaller file.');
+        if ($action === 'sample_csv') {
+            header('Content-Type: text/csv; charset=UTF-8'); header('Content-Disposition: attachment; filename="regression-sample.csv"');
+            echo "Hours,Score\r\n1,50\r\n2,55\r\n3,60\r\n4,62\r\n5,68\r\n6,75\r\n7,78\r\n8,85\r\n"; exit;
+        }
+        $payload = postText('points', '[["",""],["",""]]');
+        if (strlen($payload) > 2 * 1024 * 1024) throw new InvalidArgumentException('The dataset is too large.');
+        $decoded = json_decode($payload, true);
+        if (!is_array($decoded) || !array_is_list($decoded) || count($decoded) < 1 || count($decoded) > 5000) throw new InvalidArgumentException('Invalid dataset. Use 1 to 5,000 rows.');
+        foreach ($decoded as $pair) {
+            if (!is_array($pair) || !array_is_list($pair) || count($pair) !== 2 || !is_scalar($pair[0]) || !is_scalar($pair[1]) || strlen((string)$pair[0]) > 160 || strlen((string)$pair[1]) > 160) throw new InvalidArgumentException('Each row must contain two numeric values.');
+        }
+        $pairs = $decoded;
+        $page = max(0, min((int)postText('page', '0'), (int)floor((count($pairs) - 1) / $pageSize)));
+        // Only one page is editable per request, staying below PHP's form-field limit.
+        $edits = $_POST['edit'] ?? [];
+        if (!is_array($edits) || count($edits) > $pageSize) throw new InvalidArgumentException('Invalid edited rows.');
+        foreach ($edits as $index => $pair) {
+            if (!ctype_digit((string)$index) || $index < $page * $pageSize || $index >= min(count($pairs), ($page + 1) * $pageSize) || !is_array($pair) || count($pair) !== 2 || !isset($pair[0], $pair[1]) || !is_string($pair[0]) || !is_string($pair[1]) || strlen($pair[0]) > 160 || strlen($pair[1]) > 160) throw new InvalidArgumentException('Invalid edited row.');
+            $pairs[$index] = [$pair[0], $pair[1]];
+        }
+        $encodedCsv = postText('csv_source');
+        if (strlen($encodedCsv) > 2800000) throw new InvalidArgumentException('CSV state is too large. Choose a file no larger than 2 MB.');
+        if ($encodedCsv !== '') {
+            $csvText = base64_decode($encodedCsv, true);
+            if ($csvText === false) { $csvText = ''; throw new InvalidArgumentException('Choose your CSV file again.'); }
+        }
+        if ($action === 'preview_csv') {
+            $upload = $_FILES['csv_file'] ?? null;
+            if (is_array($upload) && ($upload['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+                if (($upload['error'] ?? -1) !== UPLOAD_ERR_OK) throw new InvalidArgumentException('CSV upload failed. Choose a file no larger than 2 MB.');
+                if (!is_string($upload['tmp_name'] ?? null) || !is_uploaded_file($upload['tmp_name'])) throw new InvalidArgumentException('Invalid CSV upload.');
+                if (filesize($upload['tmp_name']) > 2 * 1024 * 1024) throw new InvalidArgumentException('Choose a CSV file no larger than 2 MB.');
+                $csvText = file_get_contents($upload['tmp_name']);
+            }
+            if ($csvText === '') throw new InvalidArgumentException('Choose a CSV file first.');
+        }
+        if ($csvText !== '') $csvRows = parseCsvText($csvText, $delimiter === 'tab' ? "\t" : $delimiter);
+        if ($action === 'preview_csv' && max(array_map('count', $csvRows)) < 2) throw new InvalidArgumentException('At least two columns are required. Try a different separator and preview again.');
+        if ($action === 'import_csv') {
+            $import = csvPairs($csvRows, $hasHeader, $xColumn, $yColumn, $skipInvalid);
+            $pairs = $import['pairs']; $page = 0;
+            if ($hasHeader) { $axisX = label($csvRows[0][$xColumn] ?? 'X'); $axisY = label($csvRows[0][$yColumn] ?? 'Y'); }
+            $notice = 'Imported ' . count($pairs) . ' points; skipped ' . $import['skipped'] . ' invalid records. Run the model to fit this data.';
+            $csvText = ''; $csvRows = [];
+        } elseif ($action === 'sample') {
+            $pairs = array_map(fn($y, $i) => [$i + 1, $y], [50, 55, 60, 62, 68, 75, 78, 85], range(0, 7)); $page = 0;
+        } elseif ($action === 'add') {
+            if (count($pairs) >= 5000) throw new InvalidArgumentException('Use at most 5,000 rows.');
+            $pairs[] = ['', '']; $page = (int)floor((count($pairs) - 1) / $pageSize);
+        } elseif (str_starts_with($action, 'remove_')) {
+            $index = substr($action, 7);
+            if (ctype_digit($index) && isset($pairs[(int)$index]) && count($pairs) > 1) array_splice($pairs, (int)$index, 1);
+        } elseif ($action === 'previous') $page = max(0, $page - 1);
+        elseif ($action === 'next') $page++;
+
+        if (in_array($action, ['run', 'update_plot', 'zoom_in', 'zoom_out', 'reset_plot', 'predict', 'download_plot'], true)) {
+            $reg = new SimpleLinearRegression();
+            if (!$reg->train(array_column($pairs, 0), array_column($pairs, 1))) throw new InvalidArgumentException($reg->getError());
+            $result = $reg;
+            $options['axisX'] = $axisX; $options['axisY'] = $axisY;
+            $plot = renderPlot($reg, $pairs, $options); $chart = $plot['svg'];
+            $plotStatus = count($pairs) . ' points · ' . $plot['visible'] . ' in view · Zoom ' . fmt($zoom) . '×';
+            if ($action === 'download_plot') {
+                header('Content-Type: image/svg+xml; charset=UTF-8'); header('Content-Disposition: attachment; filename="regression-plot.svg"');
+                echo $chart; exit;
+            }
+            if ($predictX !== '') {
+                if (!validNumber($predictX) || !is_finite($reg->predict((float)$predictX))) $prediction = 'Enter a finite X value with magnitude at most 1e100.';
+                else $prediction = $axisY . ' = ' . fmt($reg->predict((float)$predictX)) . (((float)$predictX < $reg->getXMin() || (float)$predictX > $reg->getXMax()) ? ' (outside observed X range)' : '');
+            } elseif ($action === 'predict') $prediction = 'Enter an X value to predict Y.';
+        }
+    } catch (InvalidArgumentException $e) { $errors[] = $e->getMessage(); }
+}
+$page = max(0, min($page, (int)floor((count($pairs) - 1) / $pageSize)));
+$pagePairs = array_slice($pairs, $page * $pageSize, $pageSize, true);
