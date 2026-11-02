@@ -17,6 +17,8 @@
         <input type="hidden" name="points" value="{{points}}">
         <input type="hidden" name="page" value="{{page}}">
         <input type="hidden" name="zoom" value="{{zoom}}">
+        <input type="hidden" name="axis_x" value="{{axis_x}}">
+        <input type="hidden" name="axis_y" value="{{axis_y}}">
         <section class="card">
             <h2>Data</h2>
             <div class="upload-row">
@@ -54,13 +56,6 @@
                 <button name="action" value="run" class="btn-primary">Run</button>
             </div>
             <p id="data-status" class="status" role="status" aria-live="polite"></p>
-            <details>
-                <summary>Axis labels</summary>
-                <div class="controls">
-                    <label>X <input type="text" name="axis_x" maxlength="80" value="{{axis_x}}"></label>
-                    <label>Y <input type="text" name="axis_y" maxlength="80" value="{{axis_y}}"></label>
-                </div>
-            </details>
         </section>
         <!-- IF has_results -->
         <section class="card" data-model-result>
@@ -85,7 +80,6 @@
         </section>
         <section class="card" data-model-result>
             <h2>Plot</h2>
-            <input type="hidden" name="plot_options" value="1">
             <div class="controls">
                 <label>View <select name="mode">
                     <!-- EACH mode_options -->
@@ -95,17 +89,6 @@
                 <button name="action" value="update_plot">Update</button>
                 <button name="action" value="download_plot">Download</button>
             </div>
-            <details>
-                <summary>Plot options</summary>
-                <div class="controls">
-                    <!-- EACH checkboxes -->
-                    <label><input type="checkbox" name="{{name}}" {{checked}}> {{text}}</label>
-                    <!-- END checkboxes -->
-                    <button name="action" value="zoom_in" {{zoom_in_disabled}}>Zoom +</button>
-                    <button name="action" value="zoom_out" {{zoom_out_disabled}}>Zoom −</button>
-                    <button name="action" value="reset_plot">Reset</button>
-                </div>
-            </details>
             <div class="chart-wrap">{{{chart}}}</div>
             <div class="legend"><span>Data</span><span class="fit">Fit</span></div>
             <p class="help">{{plot_status}}</p>

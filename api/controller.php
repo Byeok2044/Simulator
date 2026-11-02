@@ -14,15 +14,10 @@ $errors = []; $notice = ''; $result = null; $chart = ''; $plotStatus = ''; $pred
 $pairs = [['', ''], ['', '']]; $page = 0; $pageSize = 100;
 $action = postText('action', 'run');
 $axisX = label(postText('axis_x', 'X')); $axisY = label(postText('axis_y', 'Y'));
-$zoomValue = postText('zoom', '1');
-$zoom = validNumber($zoomValue) ? max(.5, min(8, (float)$zoomValue)) : 1;
-if ($action === 'zoom_in') $zoom = min(8, $zoom * 1.5);
-if ($action === 'zoom_out') $zoom = max(.5, $zoom / 1.5);
-if ($action === 'reset_plot') $zoom = 1;
+$zoom = 1;
 $options = ['mode' => postText('mode') === 'residual' ? 'residual' : 'fit', 'zoom' => $zoom,
-    'line' => !isset($_POST['plot_options']) || isset($_POST['show_line']),
-    'grid' => !isset($_POST['plot_options']) || isset($_POST['show_grid']),
-    'residuals' => isset($_POST['show_residuals']), 'axisX' => $axisX, 'axisY' => $axisY];
+    'line' => true, 'grid' => true,
+    'residuals' => false, 'axisX' => $axisX, 'axisY' => $axisY];
 $predictX = postText('predict_x');
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
@@ -68,13 +63,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         } elseif ($action === 'previous') $page = max(0, $page - 1);
         elseif ($action === 'next') $page++;
 
-        if (in_array($action, ['import_csv', 'run', 'update_plot', 'zoom_in', 'zoom_out', 'reset_plot', 'predict', 'download_plot'], true)) {
+        if (in_array($action, ['import_csv', 'run', 'update_plot', 'predict', 'download_plot'], true)) {
             $reg = new SimpleLinearRegression();
             if (!$reg->train(array_column($pairs, 0), array_column($pairs, 1))) throw new InvalidArgumentException($reg->getError());
             $result = $reg;
             $options['axisX'] = $axisX; $options['axisY'] = $axisY;
             $plot = renderPlot($reg, $pairs, $options); $chart = $plot['svg'];
-            $plotStatus = count($pairs) . ' points · ' . $plot['visible'] . ' in view · Zoom ' . fmt($zoom) . '×';
+            $plotStatus = count($pairs) . ' points · ' . $plot['visible'] . ' in view';
             if ($action === 'download_plot') {
                 header('Content-Type: image/svg+xml; charset=UTF-8'); header('Content-Disposition: attachment; filename="regression-plot.svg"');
                 echo $chart; exit;

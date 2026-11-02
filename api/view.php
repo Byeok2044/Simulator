@@ -17,21 +17,16 @@ $data = [
     'rows' => [], 'pagination_hidden' => count($pairs) > $pageSize ? '' : 'hidden',
 ];
 foreach ($pagePairs as $i => $pair) $data['rows'][] = ['index' => $i, 'number' => $i + 1, 'x' => $pair[0], 'y' => $pair[1], 'remove_disabled' => count($pairs) <= 1 ? 'disabled' : ''];
-$plotChecks = ['show_line' => ['line', 'Fitted line'], 'show_residuals' => ['residuals', 'Residuals'], 'show_grid' => ['grid', 'Grid']];
 if ($result !== null) {
     $stats = [];
     foreach (['R-squared' => $result->getR2(), 'Points' => $result->getN(), 'RMSE' => sqrt($result->getSse() / $result->getN())] as $name => $value) $stats[] = ['label' => $name, 'value' => fmt($value)];
-    $checks = [];
-    foreach ($plotChecks as $name => [$key, $text]) $checks[] = ['name' => $name, 'text' => $text, 'checked' => $options[$key] ? 'checked' : ''];
     $data += ['slope' => fmt($result->getSlope()), 'sign' => $result->getIntercept() >= 0 ? '+' : '−', 'intercept' => fmt(abs($result->getIntercept())),
         'predict_x' => $predictX, 'prediction' => $prediction, 'plot_status' => $plotStatus,
-        'zoom_in_disabled' => $zoom >= 8 ? 'disabled' : '', 'zoom_out_disabled' => $zoom <= .5 ? 'disabled' : '',
         'stats' => $stats, 'constant_y' => $result->getR() === null,
-        'mode_options' => optionValues(['fit' => 'Regression', 'residual' => 'Residual plot'], $options['mode']), 'checkboxes' => $checks, 'chart' => $chart];
+        'mode_options' => optionValues(['fit' => 'Regression', 'residual' => 'Residual plot'], $options['mode']), 'chart' => $chart];
 } else {
     $state = [];
-    foreach (['plot_options' => '1', 'mode' => $options['mode'], 'predict_x' => $predictX] as $name => $value) $state[] = ['name' => $name, 'value' => $value];
-    foreach ($plotChecks as $name => [$key]) if ($options[$key]) $state[] = ['name' => $name, 'value' => '1'];
+    foreach (['mode' => $options['mode'], 'predict_x' => $predictX] as $name => $value) $state[] = ['name' => $name, 'value' => $value];
     $data['hidden_state'] = $state;
 }
 echo renderPage(__DIR__ . '/pages/regression.html', $data);
