@@ -5,5 +5,9 @@ if (($_GET['asset'] ?? null) === 'styles') {
     readfile(__DIR__ . '/assets/styles.css');
     exit;
 }
+if (($_GET['asset'] ?? null) === 'ui') {
+    require __DIR__ . '/ui.php';
+    exit;
+}
 require __DIR__ . '/controller.php';
 require __DIR__ . '/view.php';

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Linear Regression</title>
     <link rel="stylesheet" href="?asset=styles">
+    <script src="?asset=ui" defer></script>
 </head>
 <body>
 <main class="container">
@@ -41,18 +42,18 @@
                     </tbody>
                 </table>
             </div>
-            <!-- IF has_pages -->
-            <div class="actions pagination">
+            <div class="actions pagination" {{pagination_hidden}}>
                 <button name="action" value="previous" {{previous_disabled}}>Previous</button>
-                <span class="help">Page {{page_number}} of {{page_count}}</span>
+                <span class="help" id="page-status">Page {{page_number}} of {{page_count}}</span>
                 <button name="action" value="next" {{next_disabled}}>Next</button>
             </div>
-            <!-- END has_pages -->
             <div class="actions">
                 <button name="action" value="add" {{add_disabled}}>Add row</button>
                 <button name="action" value="sample">Sample data</button>
+                <button name="action" value="clear">Clear rows</button>
                 <button name="action" value="run" class="btn-primary">Run</button>
             </div>
+            <p id="data-status" class="status" role="status" aria-live="polite"></p>
             <details>
                 <summary>Axis labels</summary>
                 <div class="controls">
@@ -62,7 +63,7 @@
             </details>
         </section>
         <!-- IF has_results -->
-        <section class="card">
+        <section class="card" data-model-result>
             <h2>Results</h2>
             <div class="equation">y = {{slope}}x {{sign}} {{intercept}}</div>
             <div class="results">
@@ -82,7 +83,7 @@
             </details>
             <output class="prediction">{{prediction}}</output>
         </section>
-        <section class="card">
+        <section class="card" data-model-result>
             <h2>Plot</h2>
             <input type="hidden" name="plot_options" value="1">
             <div class="controls">

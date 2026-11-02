@@ -1,6 +1,6 @@
 # Linear Regression Simulator
 
-A PHP linear regression tool with manual entry, CSV upload, predictions, and SVG plots. The UI lives in one HTML page with separate CSS files. No JavaScript is required.
+A PHP linear regression tool with manual entry, CSV upload, predictions, and SVG plots. The UI lives in one HTML page with separate CSS files. Optional JavaScript is stored in `api/ui.php`; CSV processing, validation, calculations, and graph generation stay in PHP.
 
 Run locally with PHP 8.2 or later:
 
@@ -12,13 +12,16 @@ Open http://127.0.0.1:8093. Choose a CSV and click **Upload CSV** to import the 
 
 Limits: 2 MB per CSV, 5,000 imported points, 10,000 source records, and 200 columns. Values must be finite with magnitude at most 1e100. Missing or invalid numeric values produce an error. Extra columns are ignored.
 
-You can also edit values directly, add/remove rows, or load sample data, then click **Run**. Larger datasets show 100 editable rows per page; calculations include all pages. Axis labels, predictions, and extra plot controls are in expandable sections. Graphs support regression/residual views, zoom, residual overlays, and SVG download. RMSE is sqrt(SSE / n); R-squared is undefined for constant Y. X values must vary.
+You can also edit values directly, add/remove rows, or load sample data, then click **Run**. **Clear rows** removes data across all pages, clears old results and the selected file, and leaves two empty rows. Row controls and paging respond immediately with JavaScript. Run, upload, predictions, and plot controls update through PHP in the background, preserving your scroll position and open sections. Standard PHP form submissions remain available when JavaScript is disabled. Larger datasets show 100 editable rows per page; calculations include all pages.
+
+Axis labels, predictions, and extra plot controls are in expandable sections. Graphs support regression/residual views, zoom, residual overlays, and SVG download. RMSE is sqrt(SSE / n); R-squared is undefined for constant Y. X values must vary.
 
 File organization:
 
 - `api/pages/regression.html`: the complete simulator page.
 - `api/assets/styles.css`: UI styling, served through `?asset=styles` for the Vercel rewrite.
 - `api/assets/plot.css`: graph styling, embedded in SVG downloads.
+- `api/ui.php`: JavaScript for responsive buttons and background requests, served through `?asset=ui`.
 - `api/view.php` and `api/render.php`: prepare and safely display page values.
 - `api/controller.php`, `api/csv.php`, `api/regression.php`, and `api/plot.php`: PHP functionality.
 

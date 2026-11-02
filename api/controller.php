@@ -54,6 +54,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             $pairs = $import['pairs']; $page = 0;
             $axisX = label($import['axisX']); $axisY = label($import['axisY']);
             $notice = 'Imported ' . count($pairs) . ' points.';
+        } elseif ($action === 'clear') {
+            $pairs = [['', ''], ['', '']]; $page = 0; $zoom = 1; $predictX = '';
+            $notice = 'Rows cleared.';
         } elseif ($action === 'sample') {
             $pairs = array_map(fn($y, $i) => [$i + 1, $y], [50, 55, 60, 62, 68, 75, 78, 85], range(0, 7)); $page = 0;
         } elseif ($action === 'add') {

@@ -14,7 +14,7 @@ $data = [
     'previous_disabled' => $page === 0 ? 'disabled' : '', 'next_disabled' => ($page + 1) * $pageSize >= count($pairs) ? 'disabled' : '', 'add_disabled' => count($pairs) >= 5000 ? 'disabled' : '',
     'errors' => array_map(fn($error) => ['message' => $error], $errors), 'notice' => $notice,
     'has_results' => $result !== null, 'no_results' => $result === null,
-    'rows' => [], 'has_pages' => count($pairs) > $pageSize,
+    'rows' => [], 'pagination_hidden' => count($pairs) > $pageSize ? '' : 'hidden',
 ];
 foreach ($pagePairs as $i => $pair) $data['rows'][] = ['index' => $i, 'number' => $i + 1, 'x' => $pair[0], 'y' => $pair[1], 'remove_disabled' => count($pairs) <= 1 ? 'disabled' : ''];
 $plotChecks = ['show_line' => ['line', 'Fitted line'], 'show_residuals' => ['residuals', 'Residuals'], 'show_grid' => ['grid', 'Grid']];
