@@ -52,8 +52,25 @@ function csvPairs(array $rows, bool $header, int $xColumn, int $yColumn, bool $s
         if (!validNumber($row[$xColumn] ?? null) || !validNumber($row[$yColumn] ?? null)) $invalid[] = $i + (int)$header + 1;
         else $pairs[] = [trim($row[$xColumn]), trim($row[$yColumn])];
     }
-    if ($invalid && !$skip) throw new InvalidArgumentException('Missing, non-numeric or out-of-range values in CSV records: ' . implode(', ', array_slice($invalid, 0, 8)) . '. Fix them or enable skipping invalid records.');
+    if ($invalid && !$skip) throw new InvalidArgumentException('Missing, non-numeric or out-of-range values in CSV records: ' . implode(', ', array_slice($invalid, 0, 8)) . '. Use numeric values in the first two columns.');
     if (count($pairs) < 2) throw new InvalidArgumentException('At least 2 valid data points are required.');
     if (count($pairs) > 5000) throw new InvalidArgumentException('Use at most 5,000 valid data points.');
     return ['pairs' => $pairs, 'skipped' => count($invalid)];
+}
+
+/** Import the first two columns in one step, with optional column headers. */
+function importCsvText(string $text): array {
+    $rows = null; $lastError = null; $bestWidth = 1;
+    foreach ([',', ';', "\t"] as $separator) {
+        try {
+            $candidate = parseCsvText($text, $separator);
+            $width = count($candidate[0]);
+            if ($width > $bestWidth) { $rows = $candidate; $bestWidth = $width; }
+        } catch (InvalidArgumentException $e) { $lastError = $e; }
+    }
+    if ($rows === null) throw new InvalidArgumentException($lastError ? $lastError->getMessage() : 'Your CSV needs at least two columns: X and Y.');
+    $first = $rows[0];
+    $header = trim($first[0]) !== '' && trim($first[1]) !== '' && !is_numeric($first[0]) && !is_numeric($first[1]);
+    $import = csvPairs($rows, $header, 0, 1, false);
+    return ['pairs' => $import['pairs'], 'axisX' => $header ? $first[0] : 'X', 'axisY' => $header ? $first[1] : 'Y'];
 }
