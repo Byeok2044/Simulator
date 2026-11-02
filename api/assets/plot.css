@@ -1,10 +1,13 @@
-text{font-family:Consolas,monospace}
-.grid{stroke:#233347;stroke-width:1}
-.tick{fill:#a2b5c8;font-size:11px}
-.axis{stroke:#537089;stroke-width:1.5}
-.axis-label{fill:#00e5ff;font-size:13px}
-.point{fill:#00e5ff;stroke:#05070d;stroke-width:1.5}
-.reg-line{stroke:#ff2e88;stroke-width:3}
-.residual{stroke:#ffcd70;stroke-width:1;stroke-dasharray:4 4;opacity:.7}
-.zero{stroke:#ffcd70;stroke-width:1.5}
-
+/* CHANGED: plot recolored from the old dark/cyan theme to the green palette.
+   The dark background rectangle is hard-coded in plot.php, so it is overridden here with CSS instead (plot.php is untouched). */
+text{font-family:'Bungee',Consolas,monospace}
+svg[role="img"] > rect{fill:#fff}
+.grid{stroke:#e3eed4;stroke-width:1}
+.tick{fill:#0f2a1d;font-size:11px}
+.axis{stroke:#0f2a1d;stroke-width:1.5}
+.axis-label{fill:#0f2a1d;font-size:13px}
+.point{fill:#6b9071;stroke:#0f2a1d;stroke-width:1.5}
+.point:hover,.point:focus{fill:#ff383c}
+.reg-line{stroke:#ff383c;stroke-width:3}
+.residual{stroke:#6b9071;stroke-width:1;stroke-dasharray:4 4;opacity:.9}
+.zero{stroke:#ff383c;stroke-width:1.5}

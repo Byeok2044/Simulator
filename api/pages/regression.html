@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Linear Regression</title>
+    <!-- CHANGED: title matches the heading in the Figma frame -->
+    <title>Linear Regression Simulator</title>
+    <!-- CHANGED: loads the two fonts used in Figma (Bungee Shade = main title, Bungee = everything else) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Shade&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="?asset=styles">
     <script src="?asset=ui" defer></script>
 </head>
 <body>
 <main class="container">
-    <header><h1>Linear Regression</h1></header>
+    <!-- CHANGED: heading text now "Linear Regression Simulator" (was "Linear Regression") -->
+    <header><h1>Linear Regression Simulator</h1></header>
     <!-- EACH errors -->
     <div class="error-box" role="alert">{{message}}</div>
     <!-- END errors -->
@@ -20,75 +26,99 @@
         <input type="hidden" name="axis_x" value="{{axis_x}}">
         <input type="hidden" name="axis_y" value="{{axis_y}}">
         <input type="hidden" name="csv_name" value="{{csv_name}}">
+
+        <!-- ===== DATA CARD ===== -->
         <section class="card">
-            <h2>Data</h2>
-            <div class="upload-row">
-                <input type="file" id="csv-file" name="csv_file" aria-label="Choose CSV file" accept=".csv,text/csv,.tsv,text/tab-separated-values">
-                <button name="action" value="import_csv">Upload CSV</button>
-                <button name="action" value="remove_csv" {{remove_csv_hidden}}>Remove CSV</button>
-            </div>
-            <p id="csv-name" class="help" {{remove_csv_hidden}}>Uploaded: {{csv_name}}</p>
-            <p class="help">First two columns: X and Y. Headers are optional.</p>
-            <!-- IF notice -->
-            <p class="status" role="status">{{notice}}</p>
-            <!-- END notice -->
-            <div class="table-scroll">
-                <table id="data-table">
-                    <thead><tr><th>Row</th><th>X</th><th>Y</th><th></th></tr></thead>
-                    <tbody>
-                        <!-- EACH rows -->
-                        <tr>
-                            <td class="row-num">{{number}}</td>
-                            <td><input type="text" inputmode="decimal" name="edit[{{index}}][0]" maxlength="160" aria-label="X value, row {{number}}" value="{{x}}"></td>
-                            <td><input type="text" inputmode="decimal" name="edit[{{index}}][1]" maxlength="160" aria-label="Y value, row {{number}}" value="{{y}}"></td>
-                            <td><button name="action" value="remove_{{index}}" class="remove-row" {{remove_disabled}}>Remove</button></td>
-                        </tr>
-                        <!-- END rows -->
-                    </tbody>
-                </table>
-            </div>
-            <div class="actions pagination" {{pagination_hidden}}>
-                <button name="action" value="previous" {{previous_disabled}}>Previous</button>
-                <span class="help" id="page-status">Page {{page_number}} of {{page_count}}</span>
-                <button name="action" value="next" {{next_disabled}}>Next</button>
-            </div>
-            <div class="actions">
-                <button name="action" value="add" {{add_disabled}}>Add row</button>
-                <button name="action" value="sample">Sample data</button>
-                <button name="action" value="clear">Clear rows</button>
-                <button name="action" value="run" class="btn-primary">Run</button>
-            </div>
-            <p id="data-status" class="status" role="status" aria-live="polite"></p>
-        </section>
-        <!-- IF has_results -->
-        <section class="card" data-model-result>
-            <h2>Results</h2>
-            <div class="equation">y = {{slope}}x {{sign}} {{intercept}}</div>
-            <div class="results">
-                <!-- EACH stats -->
-                <div class="stat"><div class="label">{{label}}</div><div class="value">{{value}}</div></div>
-                <!-- END stats -->
-            </div>
-            <!-- IF constant_y -->
-            <p class="help">R-squared is undefined when all Y values are identical.</p>
-            <!-- END constant_y -->
-            <details>
-                <summary>Predict a value</summary>
-                <div class="controls">
-                    <label>X <input type="text" inputmode="decimal" name="predict_x" value="{{predict_x}}" placeholder="Enter X"></label>
-                    <button name="action" value="predict">Predict</button>
+            <!-- CHANGED: card now has a header band. The CSV controls moved into the header (right side) like the Figma frame -->
+            <div class="card-header">
+                <h2>Data</h2>
+                <div class="upload-row">
+                    <!-- CHANGED: "Choose file" is now a label wrapping the real file input (input is invisible, so it looks like plain text in the design).
+                         aria-label removed so the visible text "Choose file" is the accessible name -->
+                    <label class="header-action file-picker">Choose file<input type="file" id="csv-file" name="csv_file" accept=".csv,text/csv,.tsv,text/tab-separated-values"></label>
+                    <button class="header-action" name="action" value="import_csv">Upload CSV</button>
+                    <!-- CHANGED (new state not in Figma): Remove CSV, same style as Upload CSV; only visible when a file is chosen/uploaded -->
+                    <button class="header-action" name="action" value="remove_csv" {{remove_csv_hidden}}>Remove CSV</button>
                 </div>
-            </details>
-            <output class="prediction">{{prediction}}</output>
-        </section>
-        <section class="card" data-model-result>
-            <h2>Plot</h2>
-            <div class="controls">
-                <button name="action" value="download_plot">Download</button>
             </div>
-            <div class="chart-wrap">{{{chart}}}</div>
-            <div class="legend"><span>Data</span><span class="fit">Fit</span></div>
-            <p class="help">{{plot_status}}</p>
+            <div class="card-body">
+                <div class="table-scroll">
+                    <table id="data-table">
+                        <!-- CHANGED: "Row" and the empty header cell are now visually hidden (the Figma frame only shows X and Y) but remain for screen readers -->
+                        <thead><tr><th><span class="visually-hidden">Row</span></th><th>X</th><th>Y</th><th><span class="visually-hidden">Remove</span></th></tr></thead>
+                        <tbody>
+                            <!-- EACH rows -->
+                            <tr>
+                                <td class="row-num">{{number}}</td>
+                                <td><input type="text" inputmode="decimal" name="edit[{{index}}][0]" maxlength="160" aria-label="X value, row {{number}}" value="{{x}}"></td>
+                                <td><input type="text" inputmode="decimal" name="edit[{{index}}][1]" maxlength="160" aria-label="Y value, row {{number}}" value="{{y}}"></td>
+                                <!-- CHANGED: button now shows a red "X" like the design; the word "Remove" is kept as hidden text for screen readers -->
+                                <td><button name="action" value="remove_{{index}}" class="remove-row" {{remove_disabled}}><span aria-hidden="true">X</span><span class="visually-hidden">Remove</span></button></td>
+                            </tr>
+                            <!-- END rows -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="actions pagination" {{pagination_hidden}}>
+                    <button name="action" value="previous" {{previous_disabled}}>Previous</button>
+                    <span class="help" id="page-status">Page {{page_number}} of {{page_count}}</span>
+                    <button name="action" value="next" {{next_disabled}}>Next</button>
+                </div>
+                <!-- CHANGED: added "data-actions" class so the 3 small buttons + wide Run button lay out as in Figma -->
+                <div class="actions data-actions">
+                    <button name="action" value="add" {{add_disabled}}>Add row</button>
+                    <button name="action" value="sample">Sample data</button>
+                    <button name="action" value="clear">Clear rows</button>
+                    <button name="action" value="run" class="btn-primary">Run</button>
+                </div>
+                <!-- CHANGED: helper/status messages moved here (under the buttons) so the top of the card matches the Figma layout -->
+                <p id="csv-name" class="help" {{remove_csv_hidden}}>Uploaded: {{csv_name}}</p>
+                <p class="help">First two columns: X and Y. Headers are optional.</p>
+                <!-- IF notice -->
+                <p class="status" role="status">{{notice}}</p>
+                <!-- END notice -->
+                <p id="data-status" class="status" role="status" aria-live="polite"></p>
+            </div>
+        </section>
+
+        <!-- IF has_results -->
+        <!-- ===== RESULTS CARD ===== -->
+        <section class="card" data-model-result>
+            <div class="card-header"><h2>Results</h2></div>
+            <div class="card-body results-body">
+                <div class="equation">y = {{slope}}x {{sign}} {{intercept}}</div>
+                <div class="results">
+                    <!-- EACH stats -->
+                    <div class="stat"><div class="label">{{label}}</div><div class="value">{{value}}</div></div>
+                    <!-- END stats -->
+                </div>
+                <!-- IF constant_y -->
+                <p class="help">R-squared is undefined when all Y values are identical.</p>
+                <!-- END constant_y -->
+                <!-- CHANGED (not in Figma): "Predict a value" styled as a pill button that expands; added "predict" class and btn-primary on Predict -->
+                <details class="predict">
+                    <summary>Predict a value</summary>
+                    <div class="controls">
+                        <label>X <input type="text" inputmode="decimal" name="predict_x" value="{{predict_x}}" placeholder="Enter X"></label>
+                        <button name="action" value="predict" class="btn-primary">Predict</button>
+                    </div>
+                </details>
+                <output class="prediction">{{prediction}}</output>
+            </div>
+        </section>
+
+        <!-- ===== PLOT CARD ===== -->
+        <section class="card" data-model-result>
+            <!-- CHANGED: Download moved into the card header (right side), same style as Upload CSV -->
+            <div class="card-header">
+                <h2>Plot</h2>
+                <button class="header-action" name="action" value="download_plot">Download</button>
+            </div>
+            <div class="card-body plot-body">
+                <div class="chart-wrap">{{{chart}}}</div>
+                <div class="legend"><span>Data</span><span class="fit">Fit</span></div>
+                <p class="help">{{plot_status}}</p>
+            </div>
         </section>
         <!-- END has_results -->
         <!-- IF no_results -->
