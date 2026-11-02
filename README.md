@@ -14,7 +14,7 @@ Limits: 2 MB per CSV, 5,000 imported points, 10,000 source records, and 200 colu
 
 You can also edit values directly, add/remove rows, or load sample data, then click **Run**. **Clear rows** removes data across all pages, clears old results and the selected file, and leaves two empty rows. Row controls and paging respond immediately with JavaScript. Run, upload, predictions, and plot controls update through PHP in the background, preserving your scroll position and open sections. Standard PHP form submissions remain available when JavaScript is disabled. Larger datasets show 100 editable rows per page; calculations include all pages.
 
-Predictions are in an expandable section. Graphs support regression/residual views and SVG download, with the fitted line and grid enabled by default. Axis names come from CSV headers or default to X and Y. RMSE is sqrt(SSE / n); R-squared is undefined for constant Y. X values must vary.
+**Remove CSV** clears a selected file; after import it also clears that file's data and results. The uploaded filename remains visible until you remove or replace it. Predictions are in an expandable section. The plot toolbar contains only **Download**, which exports the regression graph as SVG. Axis names come from CSV headers or default to X and Y. RMSE is sqrt(SSE / n); R-squared is undefined for constant Y. X values must vary.
 
 File organization:
 

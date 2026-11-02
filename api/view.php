@@ -1,16 +1,11 @@
 <?php
 require_once __DIR__ . '/render.php';
 
-function optionValues(array $choices, $selected): array {
-    $items = [];
-    foreach ($choices as $value => $text) $items[] = ['value' => $value, 'text' => $text, 'selected' => (string)$selected === (string)$value ? 'selected' : ''];
-    return $items;
-}
-
 // Prepare values for the single page. All markup lives in pages/regression.html.
 $data = [
     'points' => json_encode($pairs, JSON_INVALID_UTF8_SUBSTITUTE), 'page' => $page, 'zoom' => $zoom,
     'axis_x' => $axisX, 'axis_y' => $axisY, 'row_count' => count($pairs), 'page_number' => $page + 1, 'page_count' => (int)ceil(count($pairs) / $pageSize),
+    'csv_name' => $csvName, 'remove_csv_hidden' => $csvName === '' ? 'hidden' : '',
     'previous_disabled' => $page === 0 ? 'disabled' : '', 'next_disabled' => ($page + 1) * $pageSize >= count($pairs) ? 'disabled' : '', 'add_disabled' => count($pairs) >= 5000 ? 'disabled' : '',
     'errors' => array_map(fn($error) => ['message' => $error], $errors), 'notice' => $notice,
     'has_results' => $result !== null, 'no_results' => $result === null,
@@ -23,10 +18,10 @@ if ($result !== null) {
     $data += ['slope' => fmt($result->getSlope()), 'sign' => $result->getIntercept() >= 0 ? '+' : '−', 'intercept' => fmt(abs($result->getIntercept())),
         'predict_x' => $predictX, 'prediction' => $prediction, 'plot_status' => $plotStatus,
         'stats' => $stats, 'constant_y' => $result->getR() === null,
-        'mode_options' => optionValues(['fit' => 'Regression', 'residual' => 'Residual plot'], $options['mode']), 'chart' => $chart];
+        'chart' => $chart];
 } else {
     $state = [];
-    foreach (['mode' => $options['mode'], 'predict_x' => $predictX] as $name => $value) $state[] = ['name' => $name, 'value' => $value];
+    $state[] = ['name' => 'predict_x', 'value' => $predictX];
     $data['hidden_state'] = $state;
 }
 echo renderPage(__DIR__ . '/pages/regression.html', $data);

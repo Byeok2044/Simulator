@@ -16,6 +16,19 @@ header('Content-Type: application/javascript; charset=UTF-8');
         let busy = false;
         const button = action => form.querySelector(`button[value="${action}"]`);
         const status = message => { form.querySelector('#data-status').textContent = message; };
+        function syncFile() {
+            const name = form.elements.namedItem('csv_name').value;
+            button('remove_csv').hidden = !name && !form.elements.namedItem('csv_file').files.length;
+            const caption = form.querySelector('#csv-name');
+            caption.hidden = !name;
+            caption.textContent = name ? `Uploaded: ${name}` : '';
+        }
+        function clearFile() {
+            form.elements.namedItem('csv_file').value = '';
+            form.elements.namedItem('csv_name').value = '';
+            syncFile();
+        }
+        form.elements.namedItem('csv_file').addEventListener('change', syncFile);
         function savePage() {
             [...tbody.rows].forEach((tr, offset) => {
                 rows[page * pageSize + offset] = [...tr.querySelectorAll('input')].map(input => input.value);
@@ -70,19 +83,31 @@ header('Content-Type: application/javascript; charset=UTF-8');
                 rows.push(['', '']); page = Math.floor((rows.length - 1) / pageSize);
             } else if (action === 'sample') {
                 rows = [50, 55, 60, 62, 68, 75, 78, 85].map((y, index) => [index + 1, y]); page = 0;
-            } else if (action === 'clear') {
+            } else if (action === 'clear' || action === 'remove_csv') {
+                const imported = form.elements.namedItem('csv_name').value !== '';
+                clearFile();
+                if (action === 'remove_csv' && !imported) {
+                    document.querySelectorAll('[role="alert"]').forEach(alert => { alert.hidden = true; });
+                    status('CSV removed.');
+                    form.elements.namedItem('csv_file').focus();
+                    return;
+                }
                 rows = [['', ''], ['', '']]; page = 0;
                 form.elements.namedItem('zoom').value = '1';
-                form.elements.namedItem('csv_file').value = '';
                 const prediction = form.elements.namedItem('predict_x');
                 if (prediction) prediction.value = '';
             } else if (action.startsWith('remove_')) {
                 if (rows.length > 1) rows.splice(Number(action.slice(7)), 1);
             } else page += action === 'next' ? 1 : -1;
+            if (['sample', 'clear', 'remove_csv'].includes(action)) {
+                clearFile();
+                form.elements.namedItem('axis_x').value = 'X';
+                form.elements.namedItem('axis_y').value = 'Y';
+            }
             renderRows();
-            if (action !== 'previous' && action !== 'next') stale(action === 'clear' ? 'Rows cleared.' : undefined);
+            if (action !== 'previous' && action !== 'next') stale(action === 'clear' ? 'Rows cleared.' : action === 'remove_csv' ? 'CSV removed.' : undefined);
             if (action === 'add') tbody.lastElementChild.querySelector('input').focus();
-            if (action === 'clear') tbody.rows[0].querySelector('input').focus();
+            if (action === 'clear' || action === 'remove_csv') tbody.rows[0].querySelector('input').focus();
         });
         form.addEventListener('submit', async event => {
             if (busy) { event.preventDefault(); return; }
@@ -126,6 +151,7 @@ header('Content-Type: application/javascript; charset=UTF-8');
                 controls.forEach(([control, disabled]) => { control.disabled = disabled; });
             }
         });
+        syncFile();
     }
     bindForm();
 })();

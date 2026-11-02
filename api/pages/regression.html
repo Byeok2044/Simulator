@@ -19,12 +19,15 @@
         <input type="hidden" name="zoom" value="{{zoom}}">
         <input type="hidden" name="axis_x" value="{{axis_x}}">
         <input type="hidden" name="axis_y" value="{{axis_y}}">
+        <input type="hidden" name="csv_name" value="{{csv_name}}">
         <section class="card">
             <h2>Data</h2>
             <div class="upload-row">
                 <input type="file" id="csv-file" name="csv_file" aria-label="Choose CSV file" accept=".csv,text/csv,.tsv,text/tab-separated-values">
                 <button name="action" value="import_csv">Upload CSV</button>
+                <button name="action" value="remove_csv" {{remove_csv_hidden}}>Remove CSV</button>
             </div>
+            <p id="csv-name" class="help" {{remove_csv_hidden}}>Uploaded: {{csv_name}}</p>
             <p class="help">First two columns: X and Y. Headers are optional.</p>
             <!-- IF notice -->
             <p class="status" role="status">{{notice}}</p>
@@ -81,12 +84,6 @@
         <section class="card" data-model-result>
             <h2>Plot</h2>
             <div class="controls">
-                <label>View <select name="mode">
-                    <!-- EACH mode_options -->
-                    <option value="{{value}}" {{selected}}>{{text}}</option>
-                    <!-- END mode_options -->
-                </select></label>
-                <button name="action" value="update_plot">Update</button>
                 <button name="action" value="download_plot">Download</button>
             </div>
             <div class="chart-wrap">{{{chart}}}</div>

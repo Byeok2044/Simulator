@@ -14,8 +14,9 @@ $errors = []; $notice = ''; $result = null; $chart = ''; $plotStatus = ''; $pred
 $pairs = [['', ''], ['', '']]; $page = 0; $pageSize = 100;
 $action = postText('action', 'run');
 $axisX = label(postText('axis_x', 'X')); $axisY = label(postText('axis_y', 'Y'));
+$csvName = trim(postText('csv_name')) === '' ? '' : label(basename(str_replace('\\', '/', postText('csv_name'))));
 $zoom = 1;
-$options = ['mode' => postText('mode') === 'residual' ? 'residual' : 'fit', 'zoom' => $zoom,
+$options = ['mode' => 'fit', 'zoom' => $zoom,
     'line' => true, 'grid' => true,
     'residuals' => false, 'axisX' => $axisX, 'axisY' => $axisY];
 $predictX = postText('predict_x');
@@ -48,12 +49,22 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             $import = importCsvText(file_get_contents($upload['tmp_name']));
             $pairs = $import['pairs']; $page = 0;
             $axisX = label($import['axisX']); $axisY = label($import['axisY']);
+            $csvName = label(basename(str_replace('\\', '/', is_string($upload['name'] ?? null) ? $upload['name'] : 'CSV file')));
             $notice = 'Imported ' . count($pairs) . ' points.';
+        } elseif ($action === 'remove_csv') {
+            if ($csvName !== '') {
+                $pairs = [['', ''], ['', '']]; $page = 0; $predictX = '';
+                $axisX = 'X'; $axisY = 'Y';
+            }
+            $csvName = '';
+            $notice = 'CSV removed.';
         } elseif ($action === 'clear') {
             $pairs = [['', ''], ['', '']]; $page = 0; $zoom = 1; $predictX = '';
+            $csvName = ''; $axisX = 'X'; $axisY = 'Y';
             $notice = 'Rows cleared.';
         } elseif ($action === 'sample') {
             $pairs = array_map(fn($y, $i) => [$i + 1, $y], [50, 55, 60, 62, 68, 75, 78, 85], range(0, 7)); $page = 0;
+            $csvName = ''; $axisX = 'X'; $axisY = 'Y';
         } elseif ($action === 'add') {
             if (count($pairs) >= 5000) throw new InvalidArgumentException('Use at most 5,000 rows.');
             $pairs[] = ['', '']; $page = (int)floor((count($pairs) - 1) / $pageSize);
@@ -63,7 +74,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         } elseif ($action === 'previous') $page = max(0, $page - 1);
         elseif ($action === 'next') $page++;
 
-        if (in_array($action, ['import_csv', 'run', 'update_plot', 'predict', 'download_plot'], true)) {
+        if (in_array($action, ['import_csv', 'run', 'predict', 'download_plot'], true)) {
             $reg = new SimpleLinearRegression();
             if (!$reg->train(array_column($pairs, 0), array_column($pairs, 1))) throw new InvalidArgumentException($reg->getError());
             $result = $reg;
