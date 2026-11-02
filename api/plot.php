@@ -3,13 +3,14 @@ function renderPlot(SimpleLinearRegression $model, array $pairs, array $options)
     $residual = $options['mode'] === 'residual';
     $values = array_map(fn($p) => [(float)$p[0], $residual ? (float)$p[1] - $model->predict((float)$p[0]) : (float)$p[1]], $pairs);
     $xs = array_column($values, 0); $ys = array_column($values, 1);
-    $minX = min($xs); $maxX = max($xs); $minY = min($ys); $maxY = max($ys);
-    if ($residual) { $minY = min($minY, 0); $maxY = max($maxY, 0); }
-    $centerX = ($minX + $maxX) / 2; $centerY = ($minY + $maxY) / 2;
-    $spanX = max($maxX - $minX, abs($centerX) * 1e-14, 1e-150) * 1.24 / $options['zoom'];
-    $spanY = max($maxY - $minY ?: max(abs($centerY) * .2, 1), abs($centerY) * 1e-14) * 1.24 / $options['zoom'];
-    $minX = $centerX - $spanX / 2; $maxX = $centerX + $spanX / 2;
-    $minY = $centerY - $spanY / 2; $maxY = $centerY + $spanY / 2;
+    // Anchor the view at zero. Pad the data end of each axis, keeping (0, 0)
+    // at the bottom left for non-negative data and visible when zooming.
+    $minX = min(0, min($xs)) * 1.12 / $options['zoom'];
+    $maxX = max(0, max($xs)) * 1.12 / $options['zoom'];
+    $minY = min(0, min($ys)) * 1.12 / $options['zoom'];
+    $maxY = max(0, max($ys)) * 1.12 / $options['zoom'];
+    if ($minX === $maxX) $maxX = 1 / $options['zoom'];
+    if ($minY === $maxY) $maxY = 1 / $options['zoom'];
     $L = 110; $R = 35; $T = 28; $B = 75; $W = 900; $H = 500;
     $pw = $W - $L - $R; $ph = $H - $T - $B;
     $px = fn($x) => $L + ($x - $minX) / ($maxX - $minX) * $pw;
@@ -28,7 +29,7 @@ function renderPlot(SimpleLinearRegression $model, array $pairs, array $options)
         $svg .= '<text class="tick" x="' . $c($px($x)) . '" y="449" text-anchor="middle">' . fmt($x) . '</text>';
         $svg .= '<text class="tick" x="98" y="' . $c($py($y)) . '" text-anchor="end" dominant-baseline="middle">' . fmt($y) . '</text>';
     }
-    $svg .= '<path class="axis" fill="none" d="M110 28v397h755"/><text class="axis-label" x="487.5" y="484" text-anchor="middle">' . $esc($options['axisX']) . '</text><text class="axis-label" transform="translate(20 226.5) rotate(-90)" text-anchor="middle">' . $esc($yLabel) . '</text><g clip-path="url(#plot-clip)">';
+    $svg .= '<path class="axis" fill="none" d="M' . $c($px(0)) . ' 28v397M110 ' . $c($py(0)) . 'h755"/><text class="axis-label" x="487.5" y="484" text-anchor="middle">' . $esc($options['axisX']) . '</text><text class="axis-label" transform="translate(20 226.5) rotate(-90)" text-anchor="middle">' . $esc($yLabel) . '</text><g clip-path="url(#plot-clip)">';
     if ($residual) $svg .= '<path class="zero" d="M110 ' . $c($py(0)) . 'h755"/>';
     elseif ($options['line']) $svg .= '<path class="reg-line" d="M110 ' . $c($py($model->predict($minX))) . 'L865 ' . $c($py($model->predict($maxX))) . '"/>';
     $visible = 0;
