@@ -3,23 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- CHANGED: title matches the heading in the Figma frame -->
     <title>Linear Regression Simulator</title>
-    <!-- CHANGED: loads the two fonts used in Figma (Bungee Shade = main title, Bungee = everything else) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Shade&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="?asset=styles">
+
+    <!-- INSTANT VIEW ROUTER: Detects ?view=welcome or persistent cookie -->
+    <script>
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const requestedView = urlParams.get('view');
+
+            if (requestedView === 'welcome') {
+                document.cookie = "sim_page=welcome; path=/; max-age=86400; SameSite=Lax";
+                document.documentElement.classList.add('in-welcome');
+                document.documentElement.classList.remove('in-calc');
+                if (window.history.replaceState) {
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+                return;
+            }
+
+            function getCookie(name) {
+                const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+                return match ? match[2] : null;
+            }
+
+            if (getCookie('sim_page') === 'calc') {
+                document.documentElement.classList.add('in-calc');
+            } else {
+                document.documentElement.classList.add('in-welcome');
+            }
+        })();
+    </script>
+
     <script src="?asset=ui" defer></script>
 </head>
 <body>
 <main class="container">
-    <!-- CHANGED: heading text now "Linear Regression Simulator" (was "Linear Regression") -->
+
+    <!-- ===== FRONT / WELCOME SCREEN ===== -->
+    <section id="welcome-screen" class="card welcome-card">
+        <div class="card-header">
+            <h2>Welcome</h2>
+            <span class="group-tag">BSIT 3-3 (GROUP 1)</span>
+        </div>
+        <div class="card-body welcome-body">
+            <h1 class="welcome-title">LINEAR REGRESSION SIMULATOR</h1>
+            <p class="welcome-desc">
+                Analyze bivariate data, fit linear models, inspect statistical metrics, and run interactive predictions.
+            </p>
+            <button type="button" id="start-btn" class="btn-primary start-btn">Start Simulator</button>
+        </div>
+    </section>
+
+    <!-- ===== CALCULATOR NAVIGATION ===== -->
+    <div class="calculator-nav">
+        <a href="?view=welcome" id="back-to-home-btn" class="back-nav-btn">← Back to Home</a>
+    </div>
+
     <header><h1>Linear Regression Simulator</h1></header>
+
     <!-- EACH errors -->
     <div class="error-box" role="alert">{{message}}</div>
     <!-- END errors -->
+
     <form method="post" enctype="multipart/form-data" id="regression-form">
+        <!-- FIRST SUBMIT BUTTON: Intercepts Enter key so it triggers Run instead of Upload CSV -->
+        <button type="submit" name="action" value="run" style="display: none;" aria-hidden="true"></button>
+
         <input type="hidden" name="points" value="{{points}}">
         <input type="hidden" name="page" value="{{page}}">
         <input type="hidden" name="zoom" value="{{zoom}}">
@@ -29,22 +82,17 @@
 
         <!-- ===== DATA CARD ===== -->
         <section class="card">
-            <!-- CHANGED: card now has a header band. The CSV controls moved into the header (right side) like the Figma frame -->
             <div class="card-header">
                 <h2>Data</h2>
                 <div class="upload-row">
-                    <!-- CHANGED: "Choose file" is now a label wrapping the real file input (input is invisible, so it looks like plain text in the design).
-                         aria-label removed so the visible text "Choose file" is the accessible name -->
                     <label class="header-action file-picker">Choose file<input type="file" id="csv-file" name="csv_file" accept=".csv,text/csv,.tsv,text/tab-separated-values"></label>
                     <button class="header-action" name="action" value="import_csv">Upload CSV</button>
-                    <!-- CHANGED (new state not in Figma): Remove CSV, same style as Upload CSV; only visible when a file is chosen/uploaded -->
                     <button class="header-action" name="action" value="remove_csv" {{remove_csv_hidden}}>Remove CSV</button>
                 </div>
             </div>
             <div class="card-body">
                 <div class="table-scroll">
                     <table id="data-table">
-                        <!-- CHANGED: "Row" and the empty header cell are now visually hidden (the Figma frame only shows X and Y) but remain for screen readers -->
                         <thead><tr><th><span class="visually-hidden">Row</span></th><th>X</th><th>Y</th><th><span class="visually-hidden">Remove</span></th></tr></thead>
                         <tbody>
                             <!-- EACH rows -->
@@ -52,7 +100,6 @@
                                 <td class="row-num">{{number}}</td>
                                 <td><input type="text" inputmode="decimal" name="edit[{{index}}][0]" maxlength="160" aria-label="X value, row {{number}}" value="{{x}}"></td>
                                 <td><input type="text" inputmode="decimal" name="edit[{{index}}][1]" maxlength="160" aria-label="Y value, row {{number}}" value="{{y}}"></td>
-                                <!-- CHANGED: button now shows a red "X" like the design; the word "Remove" is kept as hidden text for screen readers -->
                                 <td><button name="action" value="remove_{{index}}" class="remove-row" {{remove_disabled}}><span aria-hidden="true">X</span><span class="visually-hidden">Remove</span></button></td>
                             </tr>
                             <!-- END rows -->
@@ -64,14 +111,12 @@
                     <span class="help" id="page-status">Page {{page_number}} of {{page_count}}</span>
                     <button name="action" value="next" {{next_disabled}}>Next</button>
                 </div>
-                <!-- CHANGED: added "data-actions" class so the 3 small buttons + wide Run button lay out as in Figma -->
                 <div class="actions data-actions">
                     <button name="action" value="add" {{add_disabled}}>Add row</button>
-                    <button name="action" value="sample">Sample data</button>
+                    <button type="button" id="btn-generate-data">Generate Data</button>
                     <button name="action" value="clear">Clear rows</button>
                     <button name="action" value="run" class="btn-primary">Run</button>
                 </div>
-                <!-- CHANGED: helper/status messages moved here (under the buttons) so the top of the card matches the Figma layout -->
                 <p id="csv-name" class="help" {{remove_csv_hidden}}>Uploaded: {{csv_name}}</p>
                 <p class="help">First two columns: X and Y. Headers are optional.</p>
                 <!-- IF notice -->
@@ -95,7 +140,6 @@
                 <!-- IF constant_y -->
                 <p class="help">R-squared is undefined when all Y values are identical.</p>
                 <!-- END constant_y -->
-                <!-- CHANGED (not in Figma): "Predict a value" styled as a pill button that expands; added "predict" class and btn-primary on Predict -->
                 <details class="predict">
                     <summary>Predict a value</summary>
                     <div class="controls">
@@ -109,7 +153,6 @@
 
         <!-- ===== PLOT CARD ===== -->
         <section class="card" data-model-result>
-            <!-- CHANGED: Download moved into the card header (right side), same style as Upload CSV -->
             <div class="card-header">
                 <h2>Plot</h2>
                 <button class="header-action" name="action" value="download_plot">Download</button>
@@ -121,6 +164,7 @@
             </div>
         </section>
         <!-- END has_results -->
+
         <!-- IF no_results -->
         <!-- EACH hidden_state -->
         <input type="hidden" name="{{name}}" value="{{value}}">
@@ -128,5 +172,140 @@
         <!-- END no_results -->
     </form>
 </main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const startBtn = document.getElementById("start-btn");
+        const form = document.getElementById("regression-form");
+        const generateBtn = document.getElementById("btn-generate-data");
+
+        if (startBtn) {
+            startBtn.addEventListener("click", function () {
+                document.cookie = "sim_page=calc; path=/; max-age=86400; SameSite=Lax";
+                document.documentElement.classList.add("in-calc");
+                document.documentElement.classList.remove("in-welcome");
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+        }
+
+        if (form) {
+            form.addEventListener("submit", function () {
+                document.cookie = "sim_page=calc; path=/; max-age=86400; SameSite=Lax";
+            });
+
+            // Prevent Enter key in table cells from triggering the CSV upload button
+            form.addEventListener("keydown", function (e) {
+                if (e.key === "Enter" && e.target.tagName === "INPUT" && e.target.type === "text") {
+                    if (e.target.name === "predict_x") return;
+
+                    const textInputs = Array.from(form.querySelectorAll('table input[type="text"]'));
+                    const currentIndex = textInputs.indexOf(e.target);
+
+                    if (currentIndex > -1 && currentIndex < textInputs.length - 1) {
+                        e.preventDefault();
+                        textInputs[currentIndex + 1].focus();
+                        textInputs[currentIndex + 1].select();
+                    } else if (currentIndex === textInputs.length - 1) {
+                        e.preventDefault();
+                        const runBtn = form.querySelector('button[value="run"]');
+                        if (runBtn) runBtn.click();
+                    }
+                }
+            });
+        }
+
+        // --- RANDOM DATA GENERATOR ---
+        if (generateBtn) {
+            generateBtn.addEventListener("click", function () {
+                const xInputs = document.querySelectorAll('input[name$="[0]"]');
+                const yInputs = document.querySelectorAll('input[name$="[1]"]');
+                const totalRows = Math.min(xInputs.length, yInputs.length);
+
+                if (totalRows === 0) return;
+
+                let slope = (Math.random() * 8 - 4);
+                if (Math.abs(slope) < 0.5) slope = slope < 0 ? -1.5 : 1.5;
+
+                const intercept = Math.floor(Math.random() * 70) - 20;
+                let startX = Math.floor(Math.random() * 10);
+                const pointsArray = [];
+
+                for (let i = 0; i < totalRows; i++) {
+                    const xVal = +(startX + i * (1.5 + Math.random() * 2)).toFixed(2);
+                    const noise = (Math.random() - 0.5) * 8;
+                    const yVal = +(slope * xVal + intercept + noise).toFixed(2);
+
+                    xInputs[i].value = xVal;
+                    yInputs[i].value = yVal;
+                    pointsArray.push([xVal, yVal]);
+                }
+
+                const pointsInput = document.querySelector('input[name="points"]');
+                if (pointsInput) {
+                    pointsInput.value = JSON.stringify(pointsArray);
+                }
+
+                const statusEl = document.getElementById("data-status");
+                if (statusEl) {
+                    statusEl.textContent = "Generated new random linear dataset!";
+                    setTimeout(() => { statusEl.textContent = ""; }, 2500);
+                }
+            });
+        }
+
+        // --- GLOBAL SCATTER PLOT COORDINATE INSPECTION ---
+        let tooltip = document.querySelector(".plot-coord-tooltip");
+        if (!tooltip) {
+            tooltip = document.createElement("div");
+            tooltip.className = "plot-coord-tooltip";
+            document.body.appendChild(tooltip);
+        }
+
+        document.addEventListener("click", function (e) {
+            const chartWrap = document.querySelector(".chart-wrap");
+            if (!chartWrap) return;
+
+            const targetPoint = e.target.closest("circle, ellipse, [data-point], .point");
+
+            if (targetPoint && chartWrap.contains(targetPoint)) {
+                e.stopPropagation();
+
+                chartWrap.querySelectorAll("circle, ellipse, [data-point], .point").forEach(el => el.classList.remove("active-point"));
+                targetPoint.classList.add("active-point");
+
+                let coordText = "";
+                const titleEl = targetPoint.querySelector("title") || targetPoint.closest("g")?.querySelector("title");
+                
+                if (titleEl && titleEl.textContent.trim()) {
+                    coordText = titleEl.textContent.trim();
+                } else if (targetPoint.getAttribute("data-coords")) {
+                    coordText = targetPoint.getAttribute("data-coords");
+                } else if (targetPoint.getAttribute("data-x") && targetPoint.getAttribute("data-y")) {
+                    coordText = `(${targetPoint.getAttribute("data-x")}, ${targetPoint.getAttribute("data-y")})`;
+                } else if (targetPoint.getAttribute("aria-label")) {
+                    coordText = targetPoint.getAttribute("aria-label");
+                } else if (targetPoint.hasAttribute("cx") && targetPoint.hasAttribute("cy")) {
+                    coordText = `X: ${parseFloat(targetPoint.getAttribute("cx")).toFixed(1)}, Y: ${parseFloat(targetPoint.getAttribute("cy")).toFixed(1)}`;
+                } else {
+                    coordText = "Point selected";
+                }
+
+                const rect = targetPoint.getBoundingClientRect();
+                const pageX = rect.left + rect.width / 2 + window.scrollX;
+                const pageY = rect.top + window.scrollY;
+
+                tooltip.textContent = coordText;
+                tooltip.style.left = `${pageX}px`;
+                tooltip.style.top = `${pageY}px`;
+                tooltip.style.display = "block";
+            } else {
+                if (tooltip) tooltip.style.display = "none";
+                if (chartWrap) {
+                    chartWrap.querySelectorAll(".active-point").forEach(el => el.classList.remove("active-point"));
+                }
+            }
+        });
+    });
+</script>
 </body>
 </html>
