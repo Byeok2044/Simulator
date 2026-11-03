@@ -10,6 +10,13 @@ function renderPlot(SimpleLinearRegression $model, array $pairs, array $options)
     $minY = min(0, min($ys)) * 1.12 / $options['zoom'];
     $maxY = max(0, max($ys)) * 1.12 / $options['zoom'];
     if ($minX === $maxX) $maxX = 1 / $options['zoom'];
+    // Fit the whole drawn line, including its start and the intercept at X = 0.
+    if (!$residual && $options['line']) {
+        $lineStartY = $model->predict($minX);
+        $lineEndY = $model->predict($maxX);
+        $minY = min($minY, min(0, $lineStartY, $lineEndY) * 1.12);
+        $maxY = max($maxY, max(0, $lineStartY, $lineEndY) * 1.12);
+    }
     if ($minY === $maxY) $maxY = 1 / $options['zoom'];
     $L = 110; $R = 35; $T = 28; $B = 75; $W = 900; $H = 500;
     $pw = $W - $L - $R; $ph = $H - $T - $B;
@@ -31,7 +38,7 @@ function renderPlot(SimpleLinearRegression $model, array $pairs, array $options)
     }
     $svg .= '<path class="axis" fill="none" d="M' . $c($px(0)) . ' 28v397M110 ' . $c($py(0)) . 'h755"/><text class="axis-label" x="487.5" y="484" text-anchor="middle">' . $esc($options['axisX']) . '</text><text class="axis-label" transform="translate(20 226.5) rotate(-90)" text-anchor="middle">' . $esc($yLabel) . '</text><g clip-path="url(#plot-clip)">';
     if ($residual) $svg .= '<path class="zero" d="M110 ' . $c($py(0)) . 'h755"/>';
-    elseif ($options['line']) $svg .= '<path class="reg-line" d="M110 ' . $c($py($model->predict($minX))) . 'L865 ' . $c($py($model->predict($maxX))) . '"/>';
+    elseif ($options['line']) $svg .= '<path class="reg-line" d="M110 ' . $c($py($lineStartY)) . 'L865 ' . $c($py($lineEndY)) . '"/>';
     $visible = 0;
     foreach ($values as $i => [$x, $y]) {
         $predicted = $model->predict($x); $observed = (float)$pairs[$i][1];

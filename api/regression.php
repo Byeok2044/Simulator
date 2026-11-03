@@ -21,6 +21,16 @@ class SimpleLinearRegression {
             $this->error = 'X and Y must have the same number of values.';
             return false;
         }
+        if ($n === 0) {
+            $this->error = 'No number entered.';
+            return false;
+        }
+        foreach (array_merge($x, $y) as $value) {
+            if ($value === null || (is_string($value) && trim($value) === '')) {
+                $this->error = 'No number entered.';
+                return false;
+            }
+        }
         if ($n < 2) {
             $this->error = 'At least 2 data points are required.';
             return false;
