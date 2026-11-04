@@ -60,7 +60,8 @@
 
     <!-- ===== CALCULATOR NAVIGATION ===== -->
     <div class="calculator-nav">
-        <a href="?view=welcome" id="back-to-home-btn" class="back-nav-btn">← Back to Home</a>
+        <!-- Native link: immune to JS errors and SVG overlay click-blocking -->
+        <a href="?view=welcome" id="back-to-home-btn" class="back-nav-btn">Back to Home</a>
     </div>
 
     <header><h1>Linear Regression Simulator</h1></header>
@@ -130,16 +131,27 @@
         <section class="card" data-model-result>
             <div class="card-header"><h2>Results</h2></div>
             <div class="card-body results-body">
-                <div class="equation">y = {{slope}}x {{sign}} {{intercept}}</div>
-                <div class="results">
+                <!-- Dedicated Equation Hero Card -->
+                <div class="equation-card">
+                    <span class="equation-label">Regression Equation</span>
+                    <div class="equation-value">Y = {{slope}}X {{sign}} {{intercept}}</div>
+                </div>
+
+                <!-- Structured 4-Column Metric Grid -->
+                <div class="results-grid">
                     <!-- EACH stats -->
-                    <div class="stat"><div class="label">{{label}}</div><div class="value">{{value}}</div></div>
+                    <div class="stat">
+                        <div class="label">{{label}}</div>
+                        <div class="value">{{value}}</div>
+                    </div>
                     <!-- END stats -->
                 </div>
+
                 <!-- IF constant_y -->
                 <p class="help">Correlation coefficient and R-squared are undefined when all Y values are identical.</p>
                 <!-- END constant_y -->
-                                 <details class="predict compute">
+                
+                <details class="predict compute">
                     <summary>Computation table</summary>
                     <div class="table-scroll calc-scroll">
                         <table class="calc-table">
@@ -183,13 +195,32 @@
                     <!-- IF calc_truncated -->
                     <p class="help">Showing the first {{calc_shown}} of {{row_count}} rows. Totals and results use all {{row_count}} rows.</p>
                     <!-- END calc_truncated -->
-                    <div class="calc-steps">
-                        <p><span class="bar">X</span> = Σ X / N = {{sum_x}} / {{row_count}} = {{mean_x}}</p>
-                        <p><span class="bar">Y</span> = Σ Y / N = {{sum_y}} / {{row_count}} = {{mean_y}}</p>
-                        <p>b = Σ(X − <span class="bar">X</span>)(Y − <span class="bar">Y</span>) / Σ(X − <span class="bar">X</span>)² = {{sum_xy}} / {{sum_xx}} = {{slope}}</p>
-                        <p>a = <span class="bar">Y</span> − b<span class="bar">X</span> = {{mean_y}} − ({{slope}} × {{mean_x}}) = {{calc_a}}</p>
+                    
+                    <!-- Structured 2x2 Step Cards -->
+                    <div class="calc-steps-grid">
+                        <div class="calc-step-card">
+                            <span class="step-badge">1. Mean of X</span>
+                            <div class="step-formula"><span class="bar">X</span> = Σ X / N</div>
+                            <div class="step-calc">{{sum_x}} / {{row_count}} = <strong>{{mean_x}}</strong></div>
+                        </div>
+                        <div class="calc-step-card">
+                            <span class="step-badge">2. Mean of Y</span>
+                            <div class="step-formula"><span class="bar">Y</span> = Σ Y / N</div>
+                            <div class="step-calc">{{sum_y}} / {{row_count}} = <strong>{{mean_y}}</strong></div>
+                        </div>
+                        <div class="calc-step-card">
+                            <span class="step-badge">3. Slope (b)</span>
+                            <div class="step-formula">b = Σ(X − <span class="bar">X</span>)(Y − <span class="bar">Y</span>) / Σ(X − <span class="bar">X</span>)²</div>
+                            <div class="step-calc">{{sum_xy}} / {{sum_xx}} = <strong>{{slope}}</strong></div>
+                        </div>
+                        <div class="calc-step-card">
+                            <span class="step-badge">4. Intercept (a)</span>
+                            <div class="step-formula">a = <span class="bar">Y</span> − b<span class="bar">X</span></div>
+                            <div class="step-calc">{{mean_y}} − ({{slope}} × {{mean_x}}) = <strong>{{calc_a}}</strong></div>
+                        </div>
                     </div>
                 </details>
+
                 <details class="predict">
                     <summary>Predict a value</summary>
                     <div class="controls">
@@ -226,6 +257,8 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const startBtn = document.getElementById("start-btn");
+        const form = document.getElementById("regression-form");
+        const generateBtn = document.getElementById("btn-generate-data");
 
         if (startBtn) {
             startBtn.addEventListener("click", function () {
@@ -236,9 +269,69 @@
             });
         }
 
-        document.addEventListener("submit", function () {
-            document.cookie = "sim_page=calc; path=/; max-age=86400; SameSite=Lax";
-        });
+        if (form) {
+            form.addEventListener("submit", function () {
+                document.cookie = "sim_page=calc; path=/; max-age=86400; SameSite=Lax";
+            });
+
+            form.addEventListener("keydown", function (e) {
+                if (e.key === "Enter" && e.target.tagName === "INPUT" && e.target.type === "text") {
+                    if (e.target.name === "predict_x") return;
+
+                    const textInputs = Array.from(form.querySelectorAll('table#data-table input[type="text"]'));
+                    const currentIndex = textInputs.indexOf(e.target);
+
+                    if (currentIndex > -1 && currentIndex < textInputs.length - 1) {
+                        e.preventDefault();
+                        textInputs[currentIndex + 1].focus();
+                        textInputs[currentIndex + 1].select();
+                    } else if (currentIndex === textInputs.length - 1) {
+                        e.preventDefault();
+                        const runBtn = form.querySelector('button[value="run"]');
+                        if (runBtn) runBtn.click();
+                    }
+                }
+            });
+        }
+
+        // --- RANDOM DATA GENERATOR ---
+        if (generateBtn) {
+            generateBtn.addEventListener("click", function () {
+                const xInputs = document.querySelectorAll('table#data-table input[name$="[0]"]');
+                const yInputs = document.querySelectorAll('table#data-table input[name$="[1]"]');
+                const totalRows = Math.min(xInputs.length, yInputs.length);
+
+                if (totalRows === 0) return;
+
+                let slope = (Math.random() * 8 - 4);
+                if (Math.abs(slope) < 0.5) slope = slope < 0 ? -1.5 : 1.5;
+
+                const intercept = Math.floor(Math.random() * 70) - 20;
+                let startX = Math.floor(Math.random() * 10);
+                const pointsArray = [];
+
+                for (let i = 0; i < totalRows; i++) {
+                    const xVal = +(startX + i * (1.5 + Math.random() * 2)).toFixed(2);
+                    const noise = (Math.random() - 0.5) * 8;
+                    const yVal = +(slope * xVal + intercept + noise).toFixed(2);
+
+                    xInputs[i].value = xVal;
+                    yInputs[i].value = yVal;
+                    pointsArray.push([xVal, yVal]);
+                }
+
+                const pointsInput = document.querySelector('input[name="points"]');
+                if (pointsInput) {
+                    pointsInput.value = JSON.stringify(pointsArray);
+                }
+
+                const statusEl = document.getElementById("data-status");
+                if (statusEl) {
+                    statusEl.textContent = "Generated new random linear dataset!";
+                    setTimeout(() => { statusEl.textContent = ""; }, 2500);
+                }
+            });
+        }
 
         // --- GLOBAL SCATTER PLOT COORDINATE INSPECTION ---
         let tooltip = document.querySelector(".plot-coord-tooltip");
@@ -281,12 +374,11 @@
                 const pageX = rect.left + rect.width / 2 + window.scrollX;
                 const pageY = rect.top + window.scrollY;
 
-                                tooltip.textContent = coordText;
+                tooltip.textContent = coordText;
                 tooltip.style.left = "0px";
                 tooltip.style.top = `${pageY}px`;
                 tooltip.style.display = "block";
 
-                // Keep the whole tooltip inside the visible screen
                 const edge = 8;
                 const half = tooltip.offsetWidth / 2;
                 const minLeft = window.scrollX + edge + half;
@@ -294,7 +386,6 @@
                 const left = Math.max(minLeft, Math.min(pageX, maxLeft));
                 tooltip.style.left = `${left}px`;
 
-                // Slide the arrow so it still points at the clicked point
                 const arrow = Math.max(14, Math.min(pageX - left + half, tooltip.offsetWidth - 14));
                 tooltip.style.setProperty("--arrow-x", `${arrow}px`);
             } else {

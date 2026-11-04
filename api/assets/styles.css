@@ -12,6 +12,7 @@
 
 * { 
     box-sizing: border-box; 
+    text-shadow: none !important;
 }
 
 [hidden] { 
@@ -25,6 +26,8 @@ body {
     background: var(--bg); 
     color: var(--dark); 
     font: 14px/1.4 'Bungee', system-ui, sans-serif; 
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
 }
 
@@ -75,6 +78,7 @@ html.in-calc #regression-form {
     border: 1px solid var(--mid);
     border-radius: 8px;
     color: var(--dark);
+    font-family: 'Bungee', sans-serif !important;
     font-size: 13px;
     text-decoration: none;
     cursor: pointer !important;
@@ -94,7 +98,7 @@ html.in-calc #regression-form {
     transform: scale(0.98);
 }
 
-/* Centered Bungee Shade title */
+/* Centered Bungee Shade title (Strictly h1 only) */
 header { 
     margin-bottom: clamp(24px, 4vw, 45px); 
 }
@@ -111,6 +115,7 @@ h1 {
 
 h2 { 
     margin: 0; 
+    font-family: 'Bungee', sans-serif !important;
     font-size: clamp(16px, 2.5vw, 18px); 
     font-weight: 400; 
     line-height: 22px; 
@@ -126,7 +131,6 @@ h2 {
     overflow: hidden;
 }
 
-/* Strictly horizontal header bar across all viewports */
 .card-header { 
     display: flex; 
     flex-direction: row;
@@ -141,10 +145,10 @@ h2 {
 .card-body { 
     background: #fff; 
     border-radius: 0 0 6px 6px; 
-    padding-bottom: 15px; 
+    padding-bottom: 20px; 
 }
 
-/* ================= ENLARGED WELCOME CARD & GROUP TAG ================= */
+/* ================= WELCOME CARD & GROUP TAG ================= */
 .welcome-card { 
     max-width: 1050px; 
     margin: clamp(24px, 5vw, 60px) auto; 
@@ -152,6 +156,7 @@ h2 {
 }
 
 .group-tag {
+    font-family: 'Bungee', sans-serif !important;
     font-size: clamp(12px, 2vw, 16px);
     font-weight: 400;
     line-height: 1;
@@ -183,6 +188,7 @@ h2 {
 .welcome-desc { 
     max-width: 720px; 
     margin: 0; 
+    font-family: 'Bungee', sans-serif !important;
     font-size: clamp(14px, 2.2vw, 18px); 
     line-height: 1.6; 
     color: var(--muted); 
@@ -191,6 +197,7 @@ h2 {
 .start-btn { 
     height: clamp(46px, 6vw, 56px); 
     padding: 0 clamp(28px, 5vw, 52px); 
+    font-family: 'Bungee', sans-serif !important;
     font-size: clamp(16px, 2.5vw, 22px); 
     border-radius: 12px; 
     cursor: pointer;
@@ -205,9 +212,8 @@ h2 {
 .start-btn:active {
     transform: scale(0.98);
 }
-/* ===================================================================== */
 
-/* Header text-buttons (Choose file | Upload CSV | Remove CSV, Download) */
+/* Header text-buttons */
 .upload-row { 
     display: inline-flex; 
     align-items: center; 
@@ -227,6 +233,7 @@ h2 {
     border: 0; 
     border-radius: 0; 
     color: var(--dark); 
+    font-family: 'Bungee', sans-serif !important;
     font-size: clamp(12px, 2vw, 18px); 
     line-height: 24px; 
     cursor: pointer; 
@@ -243,7 +250,6 @@ h2 {
     border-left: 2px solid var(--dark); 
 }
 
-/* File picker transparent overlay */
 .file-picker { 
     position: relative; 
 }
@@ -263,10 +269,9 @@ h2 {
 }
 
 input, button { 
-    font: inherit; 
+    font-family: 'Bungee', system-ui, sans-serif !important; 
 }
 
-/* Small buttons */
 button { 
     height: 32px; 
     padding: 0 12px; 
@@ -274,6 +279,7 @@ button {
     border: 1px solid var(--mid); 
     border-radius: 10px; 
     color: var(--dark); 
+    font-family: 'Bungee', sans-serif !important;
     font-size: 14px; 
     line-height: 1; 
     cursor: pointer; 
@@ -295,15 +301,16 @@ button:disabled {
     padding: 0 24px; 
     background: var(--mid); 
     border-color: var(--mid); 
-    color: #fff; 
-    font-size: 18px; 
+    color: #fff !important; 
+    font-family: 'Bungee', sans-serif !important;
+    font-size: 16px; 
+    letter-spacing: 0.5px;
 }
 
 .btn-primary:hover:not(:disabled) { 
     background: #5a7e60; 
 }
 
-/* Remove Row (Red X) */
 .remove-row { 
     height: auto; 
     padding: 4px; 
@@ -320,7 +327,6 @@ button:disabled {
     color: #c9181c; 
 }
 
-/* Inputs */
 input[type="text"] { 
     width: 100%; 
     height: 42px; 
@@ -329,6 +335,7 @@ input[type="text"] {
     border: 0; 
     border-radius: 10px; 
     color: var(--dark); 
+    font-family: 'Bungee', monospace !important;
     font-size: 16px; 
     text-align: center; 
 }
@@ -343,13 +350,12 @@ input[type="text"]::placeholder {
     outline-offset: 3px; 
 }
 
-/* Helper & Status Messages */
 .help { 
     margin: 10px 0 0; 
     color: var(--muted); 
     font-size: 12px; 
     text-align: center; 
-    padding: 0 10px;
+    padding: 0 10px; 
 }
 
 .status { 
@@ -357,7 +363,7 @@ input[type="text"]::placeholder {
     color: #2e5a3f; 
     font-size: 12px; 
     text-align: center; 
-    padding: 0 10px;
+    padding: 0 10px; 
 }
 
 .status:empty { 
@@ -368,7 +374,6 @@ form[aria-busy="true"] {
     cursor: progress; 
 }
 
-/* Error box */
 .error-box { 
     margin: 0 0 25px; 
     padding: 14px 20px; 
@@ -377,7 +382,7 @@ form[aria-busy="true"] {
     border-radius: 10px; 
     color: var(--dark); 
     font-size: 14px; 
-    word-break: break-word;
+    word-break: break-word; 
 }
 
 .error-box:empty { 
@@ -386,7 +391,7 @@ form[aria-busy="true"] {
 
 /* Data table */
 .table-scroll { 
-    position: relative;
+    position: relative; 
     overflow-x: auto; 
     -webkit-overflow-scrolling: touch; 
     max-height: 380px; 
@@ -397,7 +402,7 @@ table {
     width: 100%; 
     border-collapse: collapse; 
     table-layout: fixed; 
-    min-width: 290px;
+    min-width: 290px; 
 }
 
 th { 
@@ -445,7 +450,6 @@ td input[type="text"] {
     text-align: left; 
 }
 
-/* Actions & Buttons Grid */
 .actions { 
     display: flex; 
     align-items: center; 
@@ -456,7 +460,7 @@ td input[type="text"] {
 
 .pagination { 
     margin-top: 14px; 
-    padding: 0 10px;
+    padding: 0 10px; 
 }
 
 .pagination .help { 
@@ -470,82 +474,274 @@ td input[type="text"] {
     max-width: 618px; 
     margin: 15px auto 0; 
     padding: 0 10px; 
-    width: 100%;
+    width: 100%; 
 }
 
 .data-actions .btn-primary { 
     grid-column: 1 / -1; 
-    height: 44px;
+    height: 44px; 
 }
 
-/* Results card */
+/* Results Card Base */
 .results-body { 
-    padding: clamp(24px, 5vw, 50px) clamp(14px, 3vw, 25px) clamp(20px, 4vw, 40px); 
+    padding: clamp(24px, 4vw, 45px) clamp(12px, 2vw, 24px) clamp(20px, 3.5vw, 35px); 
 }
 
-.equation { 
-    margin: 0 0 clamp(18px, 4vw, 27px); 
-    font-size: clamp(18px, 3.5vw, 24px); 
-    line-height: 1.3; 
-    text-align: center; 
-    overflow-wrap: anywhere; 
+/* ================= RESULTS: HERO BANNER & 4-COLUMN GRID ================= */
+.equation-card {
+    max-width: 720px;
+    margin: 0 auto 28px;
+    background: var(--light);
+    border: 2px solid var(--mid);
+    border-radius: 12px;
+    overflow: hidden;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(15, 42, 29, 0.08);
 }
 
-.results { 
-    display: flex; 
-    flex-wrap: wrap; 
-    justify-content: center; 
-    gap: 12px clamp(12px, 3vw, 32px); 
+.equation-label {
+    display: block;
+    background: var(--mid);
+    color: #ffffff;
+    font-family: 'Bungee', sans-serif !important;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 6px 10px;
+    text-transform: uppercase;
+    border-bottom: 2px solid rgba(15, 42, 29, 0.15);
 }
 
-.stat { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    width: 320px; 
-    max-width: 100%; 
-    min-height: 85px; 
-    padding: 8px 12px 14px; 
-    background: var(--light); 
-    border-radius: 10px; 
-    text-align: center; 
+.equation-value {
+    padding: 16px 20px;
+    font-family: 'Bungee', monospace !important;
+    font-size: clamp(20px, 3.2vw, 32px);
+    line-height: 1.25;
+    color: var(--dark);
+    overflow-wrap: anywhere;
 }
 
-.stat .label { 
-    font-size: 11px; 
-    line-height: 13px; 
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 clamp(4px, 1.2vw, 16px);
 }
 
-.stat .value { 
+.stat {
+    display: flex;
+    flex-direction: column;
+    background: var(--light);
+    border: 2px solid var(--mid);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(15, 42, 29, 0.08);
+    height: 100%;
+}
+
+.stat .label {
+    background: var(--mid);
+    color: #ffffff;
+    font-family: 'Bungee', sans-serif !important;
+    font-size: 11px;
+    line-height: 1.3;
+    padding: 8px 6px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    text-align: center;
+    border-bottom: 2px solid rgba(15, 42, 29, 0.15);
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat .value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    margin: 0;
+    padding: 14px 10px;
+    font-family: 'Bungee', monospace !important;
+    font-size: clamp(14px, 1.6vw, 18px);
+    line-height: 1.35;
+    color: var(--dark);
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+/* ================= COMPUTATION TABLE (WIDE STRETCH - MATCHES IMAGE) ================= */
+.compute { 
+    max-width: 100% !important; /* Full width stretch across card */
+    width: 100%; 
+    margin: 28px auto 0; 
+    padding: 0 clamp(4px, 1.2vw, 16px); 
+}
+
+.calc-scroll { 
+    max-height: 440px; 
     margin-top: 14px; 
-    font-size: clamp(16px, 2.5vw, 20px); 
-    line-height: 24px; 
-    overflow-wrap: anywhere; 
+    padding: 0; 
+    border: 2px solid var(--mid); 
+    border-radius: 10px; 
+    background: #fff; 
+    width: 100%; 
+    overflow-x: auto; 
+    -webkit-overflow-scrolling: touch; 
 }
 
-/* Predict Section */
-.predict { 
-    max-width: 618px; 
-    margin: 27px auto 0; 
-    padding: 0 10px;
+.calc-table { 
+    width: 100%; 
+    min-width: 820px; 
+    border-collapse: collapse; 
+    table-layout: fixed; 
+}
+
+/* Proportional Column Widths */
+.calc-table th:nth-child(1), .calc-table td:nth-child(1),
+.calc-table th:nth-child(2), .calc-table td:nth-child(2) { width: 11%; }
+.calc-table th:nth-child(3), .calc-table td:nth-child(3),
+.calc-table th:nth-child(4), .calc-table td:nth-child(4) { width: 14%; }
+.calc-table th:nth-child(5), .calc-table td:nth-child(5),
+.calc-table th:nth-child(6), .calc-table td:nth-child(6) { width: 18%; }
+.calc-table th:nth-child(7), .calc-table td:nth-child(7) { width: 14%; }
+
+.calc-table thead th { 
+    background: var(--mid) !important; 
+    color: #ffffff !important; 
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important; 
+    font-size: 13px !important; 
+    font-weight: 700 !important; 
+    letter-spacing: 0.5px; 
+    padding: 12px 6px !important; 
+    border-bottom: 2px solid var(--mid) !important; 
+    text-align: center !important; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+}
+
+.calc-table tbody td { 
+    font-family: 'Bungee', monospace !important; 
+    font-size: clamp(12px, 1.4vw, 14px) !important; 
+    padding: 11px 8px; 
+    text-align: center; 
+    color: var(--dark); 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+}
+
+.calc-table tbody tr:nth-child(even) td { 
+    background: rgba(227, 238, 212, 0.45); 
+}
+
+.calc-table tfoot td { 
+    position: sticky; 
+    bottom: 0; 
+    background: var(--light) !important; 
+    border-top: 2px solid var(--mid) !important; 
+    border-bottom: 0; 
+    font-family: 'Bungee', monospace !important; 
+    font-size: clamp(12px, 1.5vw, 15px) !important; 
+    font-weight: 400; 
+    padding: 12px 6px; 
+    color: var(--dark); 
+    text-align: center; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+}
+
+.bar { 
+    text-decoration: overline; 
+}
+
+/* ================= 2x2 STEP CARDS (MATCHES IMAGE) ================= */
+.calc-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-top: 16px;
     width: 100%;
+}
+
+.calc-step-card {
+    background: #ffffff;
+    border: 2px solid var(--mid);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+    box-shadow: 0 2px 6px rgba(15, 42, 29, 0.05);
+}
+
+.step-badge {
+    align-self: flex-start;
+    background: var(--mid);
+    color: #ffffff;
+    font-family: 'Bungee', sans-serif !important;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.step-formula {
+    font-family: 'Bungee', monospace !important;
+    font-size: 12px;
+    color: var(--dark);
+    letter-spacing: 0.3px;
+    overflow-wrap: anywhere;
+}
+
+.step-calc {
+    font-family: 'Bungee', monospace !important;
+    font-size: clamp(13px, 1.5vw, 15px);
+    color: var(--dark);
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.step-calc strong {
+    color: var(--dark);
+    background: var(--light);
+    border: 1px solid var(--mid);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* ================= PREDICT A VALUE ================= */
+.predict { 
+    max-width: 580px; 
+    margin: 28px auto 0; 
+    padding: 0 10px; 
+    width: 100%; 
 }
 
 .predict summary { 
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    width: 220px; 
-    max-width: 100%;
-    height: 34px; 
+    width: 250px; 
+    max-width: 100%; 
+    height: 38px; 
     margin: 0 auto; 
     list-style: none; 
     background: var(--bg); 
     border: 1px solid var(--mid); 
     border-radius: 10px; 
-    font-size: 14px; 
+    font-family: 'Bungee', sans-serif !important;
+    font-size: 13px; 
     cursor: pointer; 
-    touch-action: manipulation;
+    touch-action: manipulation; 
+    user-select: none; 
+    transition: background 0.15s ease; 
 }
 
 .predict summary::-webkit-details-marker { 
@@ -567,36 +763,77 @@ td input[type="text"] {
 
 .controls { 
     display: flex; 
+    flex-direction: row; 
     align-items: center; 
-    flex-wrap: wrap; 
-    gap: 9px; 
-    margin-top: 12px; 
+    justify-content: center; 
+    gap: 10px; 
+    width: 100%; 
+    max-width: 480px; 
+    margin: 16px auto 0; 
 }
 
 .controls label { 
-    display: flex; 
+    display: inline-flex; 
     align-items: center; 
-    flex: 1 1 200px; 
+    flex: 1 1 0; 
+    min-width: 0; 
     gap: 10px; 
-    font-size: clamp(15px, 2vw, 18px); 
+    font-family: 'Bungee', sans-serif !important;
+    font-size: 16px; 
+    color: var(--dark); 
+    margin: 0;
 }
 
-.controls .btn-primary {
-    flex: 1 1 120px;
+.controls label input { 
+    flex: 1 1 0; 
+    min-width: 0; 
+    height: 42px;
+    padding: 0 12px;
+    background: var(--light);
+    border: 2px solid var(--mid);
+    border-radius: 10px;
+    text-align: center;
+    font-family: 'Bungee', monospace !important;
+    font-size: 16px;
+    color: var(--dark);
+}
+
+.controls label input:focus {
+    outline: none;
+    border-color: var(--dark);
+}
+
+.controls .btn-primary { 
+    flex: 0 0 auto; 
+    width: auto; 
+    height: 42px; 
+    padding: 0 clamp(16px, 3.5vw, 24px); 
+    font-family: 'Bungee', sans-serif !important;
+    font-size: 15px; 
+    border-radius: 10px;
+    line-height: 1;
 }
 
 .prediction { 
     display: block; 
-    margin-top: 14px; 
-    font-size: clamp(15px, 2.2vw, 18px); 
-    line-height: normal; 
+    width: fit-content;
+    min-width: 200px;
+    max-width: 100%;
+    margin: 16px auto 0; 
+    padding: 10px 24px;
+    background: var(--light);
+    border: 2px solid var(--mid);
+    border-radius: 10px;
+    font-family: 'Bungee', monospace !important;
+    font-size: clamp(16px, 2.2vw, 20px); 
+    line-height: 1.3; 
     text-align: center; 
+    color: var(--dark);
     overflow-wrap: anywhere; 
-    padding: 0 10px;
 }
 
 .prediction:empty { 
-    display: none; 
+    display: none !important; 
 }
 
 /* Plot Card Body */
@@ -609,7 +846,7 @@ td input[type="text"] {
     -webkit-overflow-scrolling: touch; 
     position: relative; 
     z-index: 1; 
-    width: 100%;
+    width: 100%; 
 }
 
 .chart-wrap svg { 
@@ -618,65 +855,64 @@ td input[type="text"] {
     min-width: 480px; 
     border: 1px solid var(--line); 
     border-radius: 10px; 
-    height: auto;
+    height: auto; 
 }
 
-/* ================= SCATTER PLOT INTERACTIVITY ================= */
+/* Scatter plot interactivity */
 .chart-wrap svg line,
 .chart-wrap svg path:not([data-point]):not(.point) {
-    pointer-events: none;
+    pointer-events: none; 
 }
 
 .chart-wrap svg circle,
 .chart-wrap svg ellipse,
 .chart-wrap svg [data-point],
 .chart-wrap svg .point {
-    pointer-events: all !important;
-    cursor: pointer !important;
-    transition: r 0.15s ease, stroke-width 0.15s ease;
+    pointer-events: all !important; 
+    cursor: pointer !important; 
+    transition: r 0.15s ease, stroke-width 0.15s ease; 
 }
 
 .chart-wrap svg circle:hover,
 .chart-wrap svg circle.active-point,
 .chart-wrap svg [data-point].active-point {
-    r: 6.5px !important;
-    stroke: var(--dark) !important;
-    stroke-width: 2.5px !important;
+    r: 6.5px !important; 
+    stroke: var(--dark) !important; 
+    stroke-width: 2.5px !important; 
 }
 
 .plot-coord-tooltip {
-    position: absolute;
-    transform: translate(-50%, -100%);
-    background: var(--light);
-    border: 2px solid var(--mid);
-    color: var(--dark);
-    font-family: 'Bungee', sans-serif;
-    font-size: 12px;
-    padding: 6px 12px;
-    border-radius: 8px;
-    pointer-events: none;
-    white-space: normal;
-    width: max-content;
-    max-width: calc(100vw - 16px);
-    text-align: center;
-    overflow-wrap: anywhere;
-    z-index: 999999 !important;
-    box-shadow: 0 4px 12px rgba(15, 42, 29, 0.25);
-    display: none;
-    margin-top: -10px;
+    position: absolute; 
+    transform: translate(-50%, -100%); 
+    background: var(--light); 
+    border: 2px solid var(--mid); 
+    color: var(--dark); 
+    font-family: 'Bungee', sans-serif !important; 
+    font-size: 12px; 
+    padding: 6px 12px; 
+    border-radius: 8px; 
+    pointer-events: none; 
+    white-space: normal; 
+    width: max-content; 
+    max-width: calc(100vw - 16px); 
+    text-align: center; 
+    overflow-wrap: anywhere; 
+    z-index: 999999 !important; 
+    box-shadow: 0 4px 12px rgba(15, 42, 29, 0.25); 
+    display: none; 
+    margin-top: -10px; 
 }
 
 .plot-coord-tooltip::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: var(--arrow-x, 50%);
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: var(--mid) transparent transparent transparent;
+    content: ''; 
+    position: absolute; 
+    top: 100%; 
+    left: var(--arrow-x, 50%); 
+    margin-left: -5px; 
+    border-width: 5px; 
+    border-style: solid; 
+    border-color: var(--mid) transparent transparent transparent; 
 }
-/* ============================================================= */
 
 .legend { 
     display: flex; 
@@ -700,7 +936,6 @@ td input[type="text"] {
     background: var(--red); 
 }
 
-/* Accessible hidden */
 .visually-hidden { 
     position: absolute; 
     width: 1px; 
@@ -713,232 +948,83 @@ td input[type="text"] {
     border: 0; 
 }
 
-/* ================= RESPONSIVE BREAKPOINTS ================= */
-
-/* Tablets & Small Desktops (max-width: 900px) */
-@media (max-width: 900px) {
-    .stat {
-        width: calc(50% - 16px);
+/* Responsive adjustments */
+@media (max-width: 960px) {
+    .results-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .calc-steps-grid {
+        grid-template-columns: 1fr;
     }
 }
 
-/* Mobile Screens (max-width: 640px) */
 @media (max-width: 640px) {
     .card-header {
         min-height: 48px;
         padding: 0 12px;
         gap: 8px;
     }
-
     .group-tag {
         font-size: 11px;
     }
-
     .header-action {
         font-size: 11px;
         height: 20px;
     }
-
     .header-action + .header-action {
         padding-left: 8px;
         border-left-width: 2px;
     }
-
     .data-actions {
         grid-template-columns: 1fr;
     }
-
     .data-actions button {
         height: 38px;
     }
-
-    .stat {
-        width: 100%;
-    }
-
     td input[type="text"] {
         height: 44px;
         font-size: 15px;
     }
+}
 
+@media (max-width: 540px) {
+    .results-grid {
+        grid-template-columns: 1fr;
+    }
     .controls {
         flex-direction: column;
         align-items: stretch;
     }
-
     .controls label {
         width: 100%;
     }
-
     .controls .btn-primary {
         width: 100%;
+        height: 44px;
     }
 }
 
-/* Extra Small Phones (max-width: 400px) */
 @media (max-width: 400px) {
     body {
         padding: 15px 8px;
     }
-
     .header-action {
         font-size: 10px;
     }
-
     .header-action + .header-action {
         padding-left: 6px;
     }
-
     .group-tag {
         font-size: 10px;
     }
-
     .welcome-body {
         padding: 30px 12px;
     }
-
     .chart-wrap svg {
         min-width: 360px;
     }
 }
 
-/* ================= COMPUTATION TABLE (dropdown in Results card) =================
-   APPEND THIS TO THE VERY END OF styles.css.
-   The <details> uses class="predict compute", so it inherits the Predict dropdown
-   look (green pill summary with +/-). These rules only widen it and style the table. */
-.compute { 
-    max-width: 960px; 
-}
-
-.predict summary { 
-    width: 260px; 
-}
-
-/* Predict dropdown sits right under it with a tighter gap */
-.compute + .predict { 
-    margin-top: 12px; 
-}
-
-.calc-scroll { 
-    max-height: 340px; 
-    margin-top: 14px; 
-    padding: 0; 
-    border: 2px solid var(--mid); 
-    border-radius: 10px; 
-    background: #fff;
-}
-
-/* The global th/td rules (38px first/last columns, right-aligned last cell) are
-   meant for the data-entry table, so they are reset for this one. */
-.calc-table { 
-    table-layout: auto; 
-    min-width: 720px; 
-}
-
-.calc-table th:nth-child(n), 
-.calc-table td:nth-child(n) { 
-    width: auto; 
-    padding: 8px 12px; 
-    text-align: center; 
-    white-space: nowrap; 
-}
-
-.calc-table th:nth-child(n) { 
-    font-size: clamp(12px, 1.6vw, 14px); 
-    line-height: 1.3;
-    border-bottom: 2px solid var(--mid);
-}
-
-.calc-table td:nth-child(n) { 
-    font-size: clamp(13px, 1.8vw, 15px); 
-}
-
-.calc-table tbody tr:nth-child(even) td { 
-    background: rgba(227, 238, 212, 0.45); 
-}
-
-.calc-table tfoot td:nth-child(n) { 
-    position: sticky; 
-    bottom: 0; 
-    background: var(--light); 
-    border-top: 2px solid var(--mid); 
-    border-bottom: 0; 
-}
-
-/* X-bar / Y-bar: overline works in any font, unlike the combining macron */
-.bar { 
-    text-decoration: overline; 
-}
-
-.calc-steps { 
-    margin: 14px 0 0; 
-    padding: 10px 16px; 
-    background: var(--light); 
-    border-radius: 10px; 
-    font-size: clamp(12px, 1.8vw, 15px); 
-    line-height: 1.6; 
-    text-align: center; 
-    overflow-wrap: anywhere; 
-}
-
-.calc-steps p { 
-    margin: 6px 0; 
-}
-
-/* Plot points: no square browser outline; use a circular ring instead */
-.chart-wrap svg circle:focus,
-.chart-wrap svg circle:focus-visible { 
-    outline: none; 
-}
-
-.chart-wrap svg circle:focus-visible { 
-    r: 6.5px; 
-    stroke: var(--dark); 
-    stroke-width: 2.5px; 
-}
-
-/* Predict dropdown on mobile: in a column layout, flex-basis acts as height, so reset it */
-@media (max-width: 640px) {
-    .controls label,
-    .controls .btn-primary { 
-        flex: 0 0 auto; 
-    }
-
-    .controls .btn-primary { 
-        height: 44px; 
-        font-size: 16px;
-    }
-}
-
-/* No extra margin under the last card (the Plot card once results are shown) */
 #regression-form > section.card:last-of-type { 
     margin-bottom: 0; 
-}
-
-/* Predict dropdown: input and button side by side at every screen size */
-.controls { 
-    flex-direction: row; 
-    flex-wrap: nowrap; 
-    align-items: center; 
-    gap: 8px; 
-}
-
-.controls label { 
-    flex: 1 1 0; 
-    width: auto; 
-    min-width: 0; 
-    gap: 8px; 
-}
-
-.controls label input { 
-    flex: 1 1 0; 
-    min-width: 0; 
-}
-
-.controls .btn-primary { 
-    flex: 0 0 auto; 
-    width: auto; 
-    height: 42px; 
-    padding: 0 clamp(14px, 4vw, 24px); 
-    font-size: clamp(14px, 3.5vw, 18px); 
 }
