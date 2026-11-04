@@ -8,11 +8,11 @@ function check(bool $condition, string $message): void {
 
 foreach ([
     [[], [], 'Enter X and Y values for at least 2 rows.'],
-    [['', ''], ['', ''], 'Missing X and Y values in row 1.'],
-    [[' ', "\t"], [1, 2], 'Missing X value in row 1.'],
+    [['', ''], ['', ''], 'Missing X and Y values in rows 1, 2.'],
+    [[' ', "\t"], [1, 2], 'Missing X values in rows 1, 2.'],
     [[1, 2], [3, ''], 'Missing Y value in row 2.'],
     [[''], [''], 'Missing X and Y values in row 1.'],
-    [[null, 1], [2, 3], 'Missing X value in row 1.'],
+    [[null, 1], [2, ''], 'Missing X value in row 1. Missing Y value in row 2.'],
 ] as [$x, $y, $expectedError]) {
     $model = new SimpleLinearRegression();
     check(!$model->train($x, $y), 'Missing input must be rejected.');

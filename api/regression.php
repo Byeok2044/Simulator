@@ -25,6 +25,7 @@ class SimpleLinearRegression {
             $this->error = 'Enter X and Y values for at least 2 rows.';
             return false;
         }
+        $missingRows = [];
         for ($i = 0; $i < $n; $i++) {
             $missing = [];
             foreach (['X' => $x[$i] ?? null, 'Y' => $y[$i] ?? null] as $column => $value) {
@@ -33,10 +34,19 @@ class SimpleLinearRegression {
                 }
             }
             if ($missing) {
-                $fields = count($missing) === 2 ? 'X and Y values' : $missing[0] . ' value';
-                $this->error = 'Missing ' . $fields . ' in row ' . ($i + 1) . '.';
-                return false;
+                $missingRows[implode(' and ', $missing)][] = $i + 1;
             }
+        }
+        if ($missingRows) {
+            $messages = [];
+            foreach ($missingRows as $fields => $rows) {
+                $singleRow = count($rows) === 1;
+                $valueLabel = $singleRow && $fields !== 'X and Y' ? 'value' : 'values';
+                $rowLabel = $singleRow ? 'row' : 'rows';
+                $messages[] = "Missing $fields $valueLabel in $rowLabel " . implode(', ', $rows) . '.';
+            }
+            $this->error = implode(' ', $messages);
+            return false;
         }
         if ($n < 2) {
             $this->error = 'At least 2 data points are required.';
