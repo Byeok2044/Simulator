@@ -22,12 +22,19 @@ class SimpleLinearRegression {
             return false;
         }
         if ($n === 0) {
-            $this->error = 'No number entered.';
+            $this->error = 'Enter X and Y values for at least 2 rows.';
             return false;
         }
-        foreach (array_merge($x, $y) as $value) {
-            if ($value === null || (is_string($value) && trim($value) === '')) {
-                $this->error = 'No number entered.';
+        for ($i = 0; $i < $n; $i++) {
+            $missing = [];
+            foreach (['X' => $x[$i] ?? null, 'Y' => $y[$i] ?? null] as $column => $value) {
+                if ($value === null || (is_string($value) && trim($value) === '')) {
+                    $missing[] = $column;
+                }
+            }
+            if ($missing) {
+                $fields = count($missing) === 2 ? 'X and Y values' : $missing[0] . ' value';
+                $this->error = 'Missing ' . $fields . ' in row ' . ($i + 1) . '.';
                 return false;
             }
         }

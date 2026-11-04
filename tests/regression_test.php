@@ -7,16 +7,16 @@ function check(bool $condition, string $message): void {
 }
 
 foreach ([
-    [[], []],
-    [['', ''], ['', '']],
-    [[' ', "\t"], [1, 2]],
-    [[1, 2], [3, '']],
-    [[''], ['']],
-    [[null, 1], [2, 3]],
-] as [$x, $y]) {
+    [[], [], 'Enter X and Y values for at least 2 rows.'],
+    [['', ''], ['', ''], 'Missing X and Y values in row 1.'],
+    [[' ', "\t"], [1, 2], 'Missing X value in row 1.'],
+    [[1, 2], [3, ''], 'Missing Y value in row 2.'],
+    [[''], [''], 'Missing X and Y values in row 1.'],
+    [[null, 1], [2, 3], 'Missing X value in row 1.'],
+] as [$x, $y, $expectedError]) {
     $model = new SimpleLinearRegression();
     check(!$model->train($x, $y), 'Missing input must be rejected.');
-    check($model->getError() === 'No number entered.', 'Missing input needs its own message.');
+    check($model->getError() === $expectedError, 'Missing input must identify the affected fields.');
 }
 
 foreach (['text', '1e101', INF, NAN] as $invalid) {

@@ -89,7 +89,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             if ($predictX !== '') {
                 if (!validNumber($predictX) || !is_finite($reg->predict((float)$predictX))) $prediction = 'Enter a finite X value with magnitude at most 1e100.';
                 else $prediction = $axisY . ' = ' . fmt($reg->predict((float)$predictX)) . (((float)$predictX < $reg->getXMin() || (float)$predictX > $reg->getXMax()) ? ' (outside observed X range)' : '');
-            } elseif ($action === 'predict') $prediction = 'No number entered.';
+            } elseif ($action === 'predict') $prediction = 'Enter an X value to make a prediction.';
         }
     } catch (InvalidArgumentException $e) { $errors[] = $e->getMessage(); }
 }
