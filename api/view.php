@@ -15,9 +15,26 @@ foreach ($pagePairs as $i => $pair) $data['rows'][] = ['index' => $i, 'number' =
 if ($result !== null) {
     $stats = [];
     foreach (['R-squared' => $result->getR2(), 'Points' => $result->getN(), 'RMSE' => sqrt($result->getSse() / $result->getN())] as $name => $value) $stats[] = ['label' => $name, 'value' => fmt($value)];
+        // Computation table (display only)
+    $meanX = $result->getMeanX(); $meanY = $result->getMeanY();
+    $calcLimit = 200; $calcRows = [];
+    $sumX = 0.0; $sumY = 0.0; $sumXY = 0.0; $sumXX = 0.0;
+    $clean = fn($d, $a, $b) => abs($d) <= 1e-12 * max(abs($a), abs($b)) ? 0.0 : $d;
+    foreach ($pairs as $i => $pair) {
+        $x = (float)$pair[0]; $y = (float)$pair[1];
+        $dx = $clean($x - $meanX, $x, $meanX); $dy = $clean($y - $meanY, $y, $meanY);
+        $sumX += $x; $sumY += $y; $sumXY += $dx * $dy; $sumXX += $dx * $dx;
+        if ($i < $calcLimit) $calcRows[] = [
+            'c_x' => fmt($x), 'c_y' => fmt($y), 'c_dx' => fmt($dx), 'c_dy' => fmt($dy),
+            'c_prod' => fmt($dx * $dy), 'c_sq' => fmt($dx * $dx), 'c_pred' => fmt($result->predict($x)),
+        ];
+    }
     $data += ['slope' => fmt($result->getSlope()), 'sign' => $result->getIntercept() >= 0 ? '+' : '−', 'intercept' => fmt(abs($result->getIntercept())),
         'predict_x' => $predictX, 'prediction' => $prediction, 'plot_status' => $plotStatus,
         'stats' => $stats, 'constant_y' => $result->getR() === null,
+        'calc_rows' => $calcRows, 'calc_truncated' => count($pairs) > $calcLimit, 'calc_shown' => min(count($pairs), $calcLimit),
+        'sum_x' => fmt($sumX), 'sum_y' => fmt($sumY), 'sum_xy' => fmt($sumXY), 'sum_xx' => fmt($sumXX),
+        'mean_x' => fmt($meanX), 'mean_y' => fmt($meanY), 'calc_a' => fmt($result->getIntercept()),
         'chart' => $chart];
 } else {
     $state = [];
