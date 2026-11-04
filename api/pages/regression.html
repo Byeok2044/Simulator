@@ -118,7 +118,6 @@
                     <button name="action" value="run" class="btn-primary">Run</button>
                 </div>
                 <p id="csv-name" class="help" {{remove_csv_hidden}}>Uploaded: {{csv_name}}</p>
-                <p class="help">First two columns: X and Y. Headers are optional.</p>
                 <!-- IF notice -->
                 <p class="status" role="status">{{notice}}</p>
                 <!-- END notice -->
@@ -197,7 +196,7 @@
                         <label>X <input type="text" inputmode="decimal" name="predict_x" value="{{predict_x}}" placeholder="Enter X"></label>
                         <button name="action" value="predict" class="btn-primary">Predict</button>
                     </div>
-                    <output class="prediction">{{prediction}}</output>
+                    <output class="prediction {{prediction_class}}">{{prediction}}</output>
                 </details>
             </div>
         </section>

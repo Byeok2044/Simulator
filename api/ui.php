@@ -56,7 +56,7 @@ header('Content-Type: application/javascript; charset=UTF-8');
                 });
                 const remove = tr.querySelector('.remove-row');
                 remove.value = `remove_${index}`;
-                remove.disabled = rows.length <= 1;
+                remove.disabled = rows.length <= 2;
                 fragment.append(tr);
             });
             tbody.replaceChildren(fragment);
@@ -101,6 +101,31 @@ header('Content-Type: application/javascript; charset=UTF-8');
             if (index < cells.length - 1) { cells[index + 1].focus(); cells[index + 1].select(); }
             else button('run').click();
         });
+        // Numeric-only inputs: digits, one leading minus, one decimal point.
+        const cleanNumber = value => {
+            let text = value.replace(/[^0-9.\-]/g, '');
+            const negative = text.startsWith('-');
+            text = text.replace(/-/g, '');
+            const dot = text.indexOf('.');
+            if (dot !== -1) text = text.slice(0, dot + 1) + text.slice(dot + 1).replace(/\./g, '');
+            return (negative ? '-' : '') + text;
+        };
+        // Clear the prediction result when the Predict X field is emptied.
+        form.addEventListener('input', event => {
+            if (event.target.name !== 'predict_x') return;
+            const output = form.querySelector('.prediction');
+            if (output) output.textContent = '';
+        });
+        form.addEventListener('input', event => {
+            const input = event.target;
+            if (!input.matches('#data-table input[type="text"], input[name="predict_x"]')) return;
+            const cleaned = cleanNumber(input.value);
+            if (cleaned === input.value) return;
+            const caret = input.selectionStart ?? input.value.length;
+            const newCaret = cleanNumber(input.value.slice(0, caret)).length;
+            input.value = cleaned;
+            input.setSelectionRange(newCaret, newCaret);
+        });
         form.addEventListener('input', event => {
             if (event.target.closest('#data-table') || ['axis_x', 'axis_y'].includes(event.target.name)) stale();
         });
@@ -130,7 +155,7 @@ header('Content-Type: application/javascript; charset=UTF-8');
                 const prediction = form.elements.namedItem('predict_x');
                 if (prediction) prediction.value = '';
             } else if (action.startsWith('remove_')) {
-                if (rows.length > 1) rows.splice(Number(action.slice(7)), 1);
+                if (rows.length > 2) rows.splice(Number(action.slice(7)), 1);
             } else page += action === 'next' ? 1 : -1;
             if (['sample', 'clear', 'remove_csv'].includes(action)) {
                 clearFile();
@@ -184,7 +209,12 @@ header('Content-Type: application/javascript; charset=UTF-8');
                 controls.forEach(([control, disabled]) => { control.disabled = disabled; });
             }
         });
+        const predictionError = form.querySelector('.prediction.is-error');
+        if (predictionError && predictionError.textContent.trim()) {
+            setTimeout(() => { predictionError.textContent = ''; }, 4000);
+        }
         syncFile();
     }
     bindForm();
 })();
+    

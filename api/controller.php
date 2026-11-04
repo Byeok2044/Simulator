@@ -10,7 +10,7 @@ function label(string $value): string {
     return $value === '' ? 'Value' : (preg_match('//u', $value) === 1 ? implode('', array_slice(preg_split('//u', $value, -1, PREG_SPLIT_NO_EMPTY), 0, 80)) : 'Value');
 }
 
-$errors = []; $notice = ''; $result = null; $chart = ''; $plotStatus = ''; $prediction = '';
+$errors = []; $notice = ''; $result = null; $chart = ''; $plotStatus = ''; $prediction = ''; $predictionError = false;
 $pairs = [['', ''], ['', '']]; $page = 0; $pageSize = 100;
 $action = postText('action', 'run');
 $axisX = label(postText('axis_x', 'X')); $axisY = label(postText('axis_y', 'Y'));
@@ -70,7 +70,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             $pairs[] = ['', '']; $page = (int)floor((count($pairs) - 1) / $pageSize);
         } elseif (str_starts_with($action, 'remove_')) {
             $index = substr($action, 7);
-            if (ctype_digit($index) && isset($pairs[(int)$index]) && count($pairs) > 1) array_splice($pairs, (int)$index, 1);
+            if (ctype_digit($index) && isset($pairs[(int)$index]) && count($pairs) > 2) array_splice($pairs, (int)$index, 1);
         } elseif ($action === 'previous') $page = max(0, $page - 1);
         elseif ($action === 'next') $page++;
 
@@ -81,15 +81,16 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             $result = $reg;
             $options['axisX'] = $axisX; $options['axisY'] = $axisY;
             $plot = renderPlot($reg, $pairs, $options); $chart = $plot['svg'];
-            $plotStatus = count($pairs) . ' points · ' . $plot['visible'] . ' in view';
+            $plotStatus = count($pairs) . ' points in view';
             if ($action === 'download_plot') {
                 header('Content-Type: image/svg+xml; charset=UTF-8'); header('Content-Disposition: attachment; filename="regression-plot.svg"');
                 echo $chart; exit;
             }
             if ($predictX !== '') {
-                if (!validNumber($predictX) || !is_finite($reg->predict((float)$predictX))) $prediction = 'Enter a finite X value with magnitude at most 1e100.';
-                else $prediction = $axisY . ' = ' . fmt($reg->predict((float)$predictX)) . (((float)$predictX < $reg->getXMin() || (float)$predictX > $reg->getXMax()) ? ' (outside observed X range)' : '');
-            } elseif ($action === 'predict') $prediction = 'Enter an X value to make a prediction.';
+                if (!validNumber($predictX) || !is_finite($reg->predict((float)$predictX))) {
+                    $prediction = 'Enter a finite X value with magnitude at most 1e100.'; $predictionError = true;
+                } else $prediction = $axisY . ' = ' . fmt($reg->predict((float)$predictX)) . (((float)$predictX < $reg->getXMin() || (float)$predictX > $reg->getXMax()) ? ' (outside observed X range)' : '');
+            } elseif ($action === 'predict') { $prediction = 'No number entered.'; $predictionError = true; }
         }
     } catch (InvalidArgumentException $e) { $errors[] = $e->getMessage(); }
 }

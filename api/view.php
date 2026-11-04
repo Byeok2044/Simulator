@@ -11,7 +11,7 @@ $data = [
     'has_results' => $result !== null, 'no_results' => $result === null,
     'rows' => [], 'pagination_hidden' => count($pairs) > $pageSize ? '' : 'hidden',
 ];
-foreach ($pagePairs as $i => $pair) $data['rows'][] = ['index' => $i, 'number' => $i + 1, 'x' => $pair[0], 'y' => $pair[1], 'remove_disabled' => count($pairs) <= 1 ? 'disabled' : ''];
+foreach ($pagePairs as $i => $pair) $data['rows'][] = ['index' => $i, 'number' => $i + 1, 'x' => $pair[0], 'y' => $pair[1], 'remove_disabled' => count($pairs) <= 2 ? 'disabled' : ''];
 if ($result !== null) {
     $stats = [];
     $r = $result->getR();
@@ -32,7 +32,7 @@ if ($result !== null) {
         ];
     }
     $data += ['slope' => fmt($result->getSlope()), 'sign' => $result->getIntercept() >= 0 ? '+' : '−', 'intercept' => fmt(abs($result->getIntercept())),
-        'predict_x' => $predictX, 'prediction' => $prediction, 'plot_status' => $plotStatus,
+        'predict_x' => $predictX, 'prediction' => $prediction, 'prediction_class' => $predictionError ? 'is-error' : '', 'plot_status' => $plotStatus,
         'stats' => $stats, 'constant_y' => $result->getR() === null,
         'calc_rows' => $calcRows, 'calc_truncated' => count($pairs) > $calcLimit, 'calc_shown' => min(count($pairs), $calcLimit),
         'sum_x' => fmt($sumX), 'sum_y' => fmt($sumY), 'sum_xy' => fmt($sumXY), 'sum_xx' => fmt($sumXX),

@@ -386,6 +386,7 @@ form[aria-busy="true"] {
 
 /* Data table */
 .table-scroll { 
+    position: relative;
     overflow-x: auto; 
     -webkit-overflow-scrolling: touch; 
     max-height: 380px; 
