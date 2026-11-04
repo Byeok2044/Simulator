@@ -14,7 +14,9 @@ $data = [
 foreach ($pagePairs as $i => $pair) $data['rows'][] = ['index' => $i, 'number' => $i + 1, 'x' => $pair[0], 'y' => $pair[1], 'remove_disabled' => count($pairs) <= 1 ? 'disabled' : ''];
 if ($result !== null) {
     $stats = [];
-    foreach (['R-squared' => $result->getR2(), 'Points' => $result->getN(), 'RMSE' => sqrt($result->getSse() / $result->getN())] as $name => $value) $stats[] = ['label' => $name, 'value' => fmt($value)];
+    $r = $result->getR();
+    $correlation = $r === null ? 'Undefined' : fmt($r) . ' (' . ($r > 0 ? 'positive' : ($r < 0 ? 'negative' : 'zero')) . ' correlation)';
+    foreach (['Correlation coefficient (r)' => $correlation, 'R-squared' => fmt($result->getR2()), 'Points' => fmt($result->getN()), 'RMSE' => fmt(sqrt($result->getSse() / $result->getN()))] as $name => $value) $stats[] = ['label' => $name, 'value' => $value];
     $data += ['slope' => fmt($result->getSlope()), 'sign' => $result->getIntercept() >= 0 ? '+' : '−', 'intercept' => fmt(abs($result->getIntercept())),
         'predict_x' => $predictX, 'prediction' => $prediction, 'plot_status' => $plotStatus,
         'stats' => $stats, 'constant_y' => $result->getR() === null,
