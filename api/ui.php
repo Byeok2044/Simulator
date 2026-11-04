@@ -68,6 +68,39 @@ header('Content-Type: application/javascript; charset=UTF-8');
             points.value = JSON.stringify(rows);
             pageInput.value = page;
         }
+        // Random linear dataset. Works on the full row state, so it behaves the same
+        // after a CSV upload/remove, Sample, Clear, etc.
+        function generateData() {
+            if (busy) return;
+            const total = Math.max(rows.length, 2);
+            let slope = Math.random() * 8 - 4;
+            if (Math.abs(slope) < 0.5) slope = slope < 0 ? -1.5 : 1.5;
+            const intercept = Math.floor(Math.random() * 70) - 20;
+            const startX = Math.floor(Math.random() * 10);
+            rows = Array.from({ length: total }, (_, i) => {
+                const x = +(startX + i * (1.5 + Math.random() * 2)).toFixed(2);
+                const noise = (Math.random() - 0.5) * 8;
+                return [x, +(slope * x + intercept + noise).toFixed(2)];
+            });
+            page = 0;
+            clearFile();
+            form.elements.namedItem('axis_x').value = 'X';
+            form.elements.namedItem('axis_y').value = 'Y';
+            renderRows();
+            stale('Generated a new random dataset. Run to update results.');
+        }
+        form.querySelector('#btn-generate-data')?.addEventListener('click', generateData);
+        // Enter moves down the table; Enter in the last cell runs the model.
+        form.addEventListener('keydown', event => {
+            const input = event.target;
+            if (event.key !== 'Enter' || input.tagName !== 'INPUT' || input.type !== 'text' || input.name === 'predict_x') return;
+            const cells = [...form.querySelectorAll('#data-table input[type="text"]')];
+            const index = cells.indexOf(input);
+            if (index < 0) return;
+            event.preventDefault();
+            if (index < cells.length - 1) { cells[index + 1].focus(); cells[index + 1].select(); }
+            else button('run').click();
+        });
         form.addEventListener('input', event => {
             if (event.target.closest('#data-table') || ['axis_x', 'axis_y'].includes(event.target.name)) stale();
         });

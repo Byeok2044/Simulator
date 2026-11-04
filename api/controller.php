@@ -50,7 +50,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             $pairs = $import['pairs']; $page = 0;
             $axisX = label($import['axisX']); $axisY = label($import['axisY']);
             $csvName = label(basename(str_replace('\\', '/', is_string($upload['name'] ?? null) ? $upload['name'] : 'CSV file')));
-            $notice = 'Imported ' . count($pairs) . ' points.';
+            $notice = 'Imported ' . count($pairs) . ' points. Click Run to calculate.';
         } elseif ($action === 'remove_csv') {
             if ($csvName !== '') {
                 $pairs = [['', ''], ['', '']]; $page = 0; $predictX = '';
@@ -74,7 +74,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         } elseif ($action === 'previous') $page = max(0, $page - 1);
         elseif ($action === 'next') $page++;
 
-        if (in_array($action, ['import_csv', 'run', 'predict', 'download_plot'], true)) {
+        // CHANGED: Removed 'import_csv' so calculation only executes on explicit run, predict, or download
+        if (in_array($action, ['run', 'predict', 'download_plot'], true)) {
             $reg = new SimpleLinearRegression();
             if (!$reg->train(array_column($pairs, 0), array_column($pairs, 1))) throw new InvalidArgumentException($reg->getError());
             $result = $reg;

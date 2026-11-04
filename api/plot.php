@@ -24,7 +24,7 @@ function renderPlot(SimpleLinearRegression $model, array $pairs, array $options)
     $py = fn($y) => $T + $ph - ($y - $minY) / ($maxY - $minY) * $ph;
     $c = fn($v) => number_format($v, 3, '.', '');
     $esc = fn($v) => htmlspecialchars((string)$v, ENT_QUOTES | ENT_XML1 | ENT_SUBSTITUTE, 'UTF-8');
-    $title = $residual ? 'Residual plot' : 'Scatter plot with linear regression';
+    $title = $residual ? 'Residual Plot' : 'Scatter Plot with Linear Regression';
     $yLabel = $residual ? 'Residual' : $options['axisY'];
     $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" role="img" aria-labelledby="plot-title plot-description">';
     $svg .= '<title id="plot-title">' . $title . '</title><desc id="plot-description">' . count($pairs) . ' observations. X: ' . $esc($options['axisX']) . '. Y: ' . $esc($yLabel) . '.</desc>';
