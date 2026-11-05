@@ -1,7 +1,7 @@
 <?php
 function generateExplanation(SimpleLinearRegression $result): string {
     $envFile = dirname(__DIR__) . '/.env';
-    $settings = is_readable($envFile) ? (@parse_ini_file($envFile, false, INI_SCANNER_RAW) ?: []) : [];
+    $settings = @parse_ini_file($envFile, false, INI_SCANNER_RAW) ?: [];
     $setting = static function (string $name, string $default = '') use ($settings): string {
         $value = getenv($name);
         return trim($value === false ? ($settings[$name] ?? $default) : $value);
@@ -11,7 +11,7 @@ function generateExplanation(SimpleLinearRegression $result): string {
     if ($key === '') {
         throw new RuntimeException('Set GEMINI_API_KEY in the server settings to generate an explanation.');
     }
-    if (!preg_match('/\A[A-Za-z0-9_-]+\z/', $key) || !preg_match('/\Agemini-[a-z0-9.-]+\z/', $model)) {
+    if (!preg_match('/\A[A-Za-z0-9_.-]+\z/', $key) || !preg_match('/\Agemini-[a-z0-9.-]+\z/', $model)) {
         throw new RuntimeException('Check GEMINI_API_KEY and GEMINI_MODEL in the server settings.');
     }
     if (!function_exists('curl_init')) {
@@ -37,7 +37,7 @@ Use only the supplied statistics. Avoid causal claims and avoid judging RMSE wit
 PROMPT;
     $body = json_encode([
         'contents' => [['parts' => [['text' => $prompt . "\n\n" . $summary]]]],
-        'generationConfig' => ['maxOutputTokens' => 1024],
+        'generationConfig' => ['maxOutputTokens' => 4096],
     ]);
 
     $request = curl_init("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent");
