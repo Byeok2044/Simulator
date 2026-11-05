@@ -29,6 +29,18 @@ check($model->train(['0', '1'], ['0', '1']), 'Zero is a number, not missing inpu
 check(!$model->train([1], [2]), 'A single valid point is insufficient.');
 check($model->getError() === 'At least 2 data points are required.', 'Keep the minimum data requirement.');
 
+foreach ([
+    [[1, 2], [2, 4], 1],
+    [[1, 2, 3], [6, 4, 2], -1],
+] as [$x, $y, $expectedR]) {
+    check($model->train($x, $y), 'Perfect fit data must train successfully.');
+    check($model->getR() === $expectedR && $model->getR2() === 1, 'Perfect fits must report exact correlation and R-squared.');
+}
+check($model->train([1, 2, 3], [2, 4.001, 6]), 'Nearly linear data must train successfully.');
+check($model->getR() < 1 && $model->getR2() < 1, 'A nearly perfect fit must retain its computed correlation and R-squared.');
+check($model->train([1, 2], [4, 4]), 'Constant Y data must train successfully.');
+check($model->getR() === null && $model->getR2() === null, 'Constant Y must have undefined correlation and R-squared.');
+
 $options = ['mode' => 'fit', 'zoom' => 1, 'line' => true, 'grid' => true,
     'residuals' => false, 'axisX' => 'X', 'axisY' => 'Y'];
 foreach ([

@@ -82,17 +82,23 @@ class SimpleLinearRegression {
             $this->error = 'This data exceeds numerical precision. Rescale your X and Y values.';
             return false;
         }
-        $this->r = $syy == 0 ? null : max(-1, min(1, ($sxy / sqrt($sxx)) / sqrt($syy)));
-        $this->r2 = $this->r === null ? null : $this->r * $this->r;
         $this->sse = 0;
+        $exactFit = true;
         for ($i = 0; $i < $n; $i++) {
             $d = $y[$i] - $this->predict($x[$i]);
+            $exactFit = $exactFit && $d == 0.0;
             $this->sse += $d * $d;
         }
         if (!is_finite($this->sse)) {
             $this->error = 'This data exceeds numerical precision. Rescale your X and Y values.';
             return false;
         }
+        $this->r = $syy == 0 ? null : max(-1, min(1, ($sxy / sqrt($sxx)) / sqrt($syy)));
+        // Two distinct points define a line, and exact fits can round just below |r| = 1.
+        if ($this->r !== null && ($n === 2 || $exactFit)) {
+            $this->r = $sxy < 0 ? -1 : 1;
+        }
+        $this->r2 = $this->r === null ? null : $this->r * $this->r;
         $this->n = $n;
         $this->meanX = $meanX;
         $this->meanY = $meanY;

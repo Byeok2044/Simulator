@@ -33,6 +33,7 @@ function generateExplanation(SimpleLinearRegression $result): string {
 Explain these simple linear regression results to a beginner in one short paragraph of plain text.
 Describe the equation and the predicted change in Y per one-unit increase in X. Interpret the correlation,
 R-squared, and RMSE in context and mention the sample size. A null metric is undefined for constant Y.
+If correlation is 1 or -1, or R-squared is 1, state those values exactly without saying "approximately".
 Use only the supplied statistics. Avoid causal claims and avoid judging RMSE without a known scale.
 PROMPT;
     $body = json_encode([
@@ -46,20 +47,29 @@ PROMPT;
         CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'x-goog-api-key: ' . $key],
         CURLOPT_POSTFIELDS => $body,
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_CONNECTTIMEOUT => 5,
-        CURLOPT_TIMEOUT => 20,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT => 30,
     ]);
     $response = curl_exec($request);
     $status = curl_getinfo($request, CURLINFO_RESPONSE_CODE);
 
+    if ($response === false) {
+        $error = curl_errno($request);
+        error_log("Gemini connection failed (cURL {$error}, HTTP {$status}).");
+        if ($error === CURLE_OPERATION_TIMEDOUT) {
+            throw new RuntimeException('The request to Gemini timed out. Please try again.');
+        }
+        throw new RuntimeException('Could not reach Gemini from the server. Please try again.');
+    }
     if ($status === 429) {
         throw new RuntimeException('Gemini has reached its usage limit. Try again later.');
     }
     if (in_array($status, [400, 401, 403, 404], true)) {
         throw new RuntimeException('Gemini rejected the request. Check your API key and model settings.');
     }
-    if (!is_string($response) || $status !== 200) {
-        throw new RuntimeException('Could not reach Gemini. Please try again.');
+    if ($status !== 200) {
+        error_log("Gemini returned HTTP {$status}.");
+        throw new RuntimeException('Gemini returned an unexpected response. Please try again.');
     }
 
     $data = json_decode($response, true);
