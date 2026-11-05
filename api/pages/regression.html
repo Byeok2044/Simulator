@@ -129,10 +129,12 @@
         <!-- IF has_results -->
         <!-- ===== RESULTS CARD ===== -->
         <section class="card" data-model-result>
-            <div class="card-header"><h2>Results</h2></div>
-            <div class="results-tabs" role="tablist" aria-label="Results" data-results-tab="{{active_results_tab}}" hidden>
-                <button type="button" role="tab" id="tab-overview" aria-controls="results-overview">Overview</button>
-                <button type="button" role="tab" id="tab-explanation" aria-controls="results-explanation">Explanation</button>
+            <div class="card-header results-header">
+                <h2>Results</h2>
+                <div class="results-tabs" role="tablist" aria-label="Results" data-results-tab="{{active_results_tab}}" hidden>
+                    <button type="button" role="tab" id="tab-overview" aria-controls="results-overview">Overview</button>
+                    <button type="button" role="tab" id="tab-explanation" aria-controls="results-explanation">Explanation</button>
+                </div>
             </div>
             <div class="card-body results-body" id="results-overview">
                 <!-- Dedicated Equation Hero Card -->
@@ -237,17 +239,20 @@
                     <output class="prediction {{prediction_class}}">{{prediction}}</output>
                 </details>
             </div>
-            <div class="card-body results-body" id="results-explanation">
-                <h3>AI explanation</h3>
-                <p>Get a plain-language summary of the regression results. Only summary statistics are sent to Gemini.</p>
-                <button type="submit" name="action" value="explain" class="btn-primary">Generate Explanation</button>
-                <div class="explanation-feedback" aria-live="polite">
-                    <!-- IF explanation -->
-                    <p class="explanation-text" tabindex="-1">{{explanation}}</p>
-                    <!-- END explanation -->
-                    <!-- IF explanation_error -->
-                    <p role="alert">{{explanation_error}}</p>
-                    <!-- END explanation_error -->
+            <div class="card-body" id="results-explanation">
+                <div class="explanation-content">
+                    <div class="explanation-toolbar">
+                        <div>
+                            <h3>AI explanation</h3>
+                            <p>Only summary statistics are sent to Gemini.</p>
+                        </div>
+                        <button type="submit" name="action" value="explain" class="btn-primary">Generate Explanation</button>
+                    </div>
+                    <div class="explanation-feedback" aria-live="polite"><!-- IF explanation -->
+                        <p class="explanation-text" tabindex="-1">{{explanation}}</p>
+                    <!-- END explanation --><!-- IF explanation_error -->
+                        <p role="alert">{{explanation_error}}</p>
+                    <!-- END explanation_error --></div>
                 </div>
             </div>
         </section>

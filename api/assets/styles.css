@@ -487,37 +487,92 @@ td input[type="text"] {
     padding: clamp(24px, 4vw, 45px) clamp(12px, 2vw, 24px) clamp(20px, 3.5vw, 35px); 
 }
 
+.card-header.results-header {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px 20px;
+    min-height: 0;
+    padding-block: 8px;
+}
+
 .results-tabs {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    padding: 16px 12px 0;
+    gap: 4px;
 }
 
-.results-tabs [aria-selected="true"] {
-    background: var(--mid);
+.results-tabs button {
+    background: var(--light);
+    border-color: transparent;
+    font-size: 12px;
+}
+
+.results-tabs button[aria-selected="true"] {
+    background: var(--dark);
     color: #fff;
 }
 
 #results-explanation {
-    text-align: center;
+    padding: clamp(14px, 2vw, 24px);
+    background: #f6f9f5;
+}
+
+.explanation-content {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.explanation-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+}
+
+.explanation-toolbar h3 {
+    margin: 0 0 3px;
+    font-size: 16px;
+}
+
+.explanation-toolbar p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
 }
 
 #results-explanation .btn-primary {
     height: auto;
-    min-height: 40px;
+    min-height: 36px;
     max-width: 100%;
     padding: 8px 12px;
+    background: var(--dark);
+    font-size: 13px;
     line-height: 1.3;
 }
 
-.explanation-text {
-    max-width: 66ch;
-    margin: 16px auto 0;
-    text-align: left;
-    white-space: pre-wrap;
+#results-explanation .btn-primary:hover:not(:disabled) {
+    background: var(--muted);
+}
+
+.explanation-feedback:not(:empty) {
+    margin-top: 12px;
+    padding: clamp(12px, 2vw, 18px);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-inline-start: 4px solid var(--mid);
+    border-radius: 8px;
+    font-size: clamp(13px, 1.5vw, 15px);
+    line-height: 1.65;
     overflow-wrap: anywhere;
+}
+
+.explanation-feedback p {
+    margin: 0;
+}
+
+.explanation-text {
+    white-space: pre-wrap;
 }
 
 /* ================= RESULTS: HERO BANNER & 4-COLUMN GRID ================= */
