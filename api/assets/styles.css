@@ -699,9 +699,9 @@ td input[type="text"] {
 .calc-table thead th { 
     background: var(--mid) !important; 
     color: #ffffff !important; 
-    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important; 
+    font-family: 'Bungee', sans-serif !important;
     font-size: 13px !important; 
-    font-weight: 700 !important; 
+    font-weight: 400 !important;
     letter-spacing: 0.5px; 
     padding: 12px 6px !important; 
     border-bottom: 2px solid var(--mid) !important; 
