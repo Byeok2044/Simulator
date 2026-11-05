@@ -515,6 +515,7 @@ td input[type="text"] {
 #results-explanation {
     padding: clamp(14px, 2vw, 24px);
     background: #f6f9f5;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 .explanation-content {
@@ -542,6 +543,7 @@ td input[type="text"] {
 }
 
 #results-explanation .btn-primary {
+    font-family: inherit !important;
     height: auto;
     min-height: 36px;
     max-width: 100%;
