@@ -33,8 +33,16 @@ if ($result !== null) {
             'c_prod' => fmt($dx * $dy), 'c_sq' => fmt($dx * $dx), 'c_pred' => fmt($result->predict($x)),
         ];
     }
-    $run = $result->getXMax() - $result->getXMin();
+    $minX = $result->getXMin();
+    $maxX = $result->getXMax();
+    $run = $maxX - $minX;
     $rise = $result->getSlope() * $run;
+    $displayMinX = fmt($minX);
+    $displayMaxX = fmt($maxX);
+    if ($displayMinX === $displayMaxX) {
+        $displayMinX = json_encode($minX);
+        $displayMaxX = json_encode($maxX);
+    }
     $data += ['slope' => fmt($result->getSlope()), 'sign' => $result->getIntercept() >= 0 ? '+' : '−', 'intercept' => fmt(abs($result->getIntercept())),
         'predict_x' => $predictX, 'prediction' => $prediction, 'prediction_class' => $predictionError ? 'is-error' : '', 'plot_status' => $plotStatus,
         'stats' => $stats, 'constant_y' => $result->getR() === null,
@@ -42,6 +50,7 @@ if ($result !== null) {
         'sum_x' => fmt($sumX), 'sum_y' => fmt($sumY), 'sum_xy' => fmt($sumXY), 'sum_xx' => fmt($sumXX),
         'mean_x' => fmt($meanX), 'mean_y' => fmt($meanY), 'calc_a' => fmt($result->getIntercept()),
         'calc_rise' => fmt($rise), 'calc_run' => fmt($run),
+        'calc_x_max' => $displayMaxX, 'calc_x_min' => $minX < 0 ? '(' . $displayMinX . ')' : $displayMinX,
         'chart' => $chart];
 } else {
     $state = [];
