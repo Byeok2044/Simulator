@@ -11,6 +11,7 @@ function label(string $value): string {
 }
 
 $errors = []; $notice = ''; $result = null; $chart = ''; $plotStatus = ''; $prediction = ''; $predictionError = false;
+$explanation = ''; $explanationError = '';
 $pairs = [['', ''], ['', '']]; $page = 0; $pageSize = 100;
 $action = postText('action', 'run');
 $axisX = label(postText('axis_x', 'X')); $axisY = label(postText('axis_y', 'Y'));
@@ -74,8 +75,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         } elseif ($action === 'previous') $page = max(0, $page - 1);
         elseif ($action === 'next') $page++;
 
-        // CHANGED: Removed 'import_csv' so calculation only executes on explicit run, predict, or download
-        if (in_array($action, ['run', 'predict', 'download_plot'], true)) {
+        if (in_array($action, ['run', 'predict', 'download_plot', 'explain'], true)) {
             $reg = new SimpleLinearRegression();
             if (!$reg->train(array_column($pairs, 0), array_column($pairs, 1))) throw new InvalidArgumentException($reg->getError());
             $result = $reg;
@@ -91,6 +91,14 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
                     $prediction = 'Enter a finite X value with magnitude at most 1e100.'; $predictionError = true;
                 } else $prediction = $axisY . ' = ' . fmt($reg->predict((float)$predictX)) . (((float)$predictX < $reg->getXMin() || (float)$predictX > $reg->getXMax()) ? ' (outside observed X range)' : '');
             } elseif ($action === 'predict') { $prediction = 'No number entered.'; $predictionError = true; }
+            if ($action === 'explain') {
+                require_once __DIR__ . '/gemini.php';
+                try {
+                    $explanation = generateExplanation($result);
+                } catch (RuntimeException $e) {
+                    $explanationError = $e->getMessage();
+                }
+            }
         }
     } catch (InvalidArgumentException $e) { $errors[] = $e->getMessage(); }
 }

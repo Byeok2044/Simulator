@@ -16,6 +16,12 @@ You can also edit values directly, add/remove rows, or load sample data, then cl
 
 **Remove CSV** clears a selected file; after import it also clears that file's data and results. The uploaded filename remains visible until you remove or replace it. Predictions are in an expandable section. The plot toolbar contains only **Download**, which exports the regression graph as SVG. Axis names come from CSV headers or default to X and Y. RMSE is sqrt(SSE / n); R-squared is undefined for constant Y. X values must vary.
 
+### Gemini explanations
+
+For local use, set `GEMINI_API_KEY` and `GEMINI_MODEL` in the project-root `.env` file. The default model is `gemini-3.5-flash-lite`. On Vercel, set them in the project's Environment Variables settings. PHP needs the cURL extension to call Gemini.
+
+After **Run**, open **Results → Explanation** and select **Generate Explanation**. PHP sends only the regression equation, slope, correlation, R², RMSE, and sample size to Gemini.
+
 File organization:
 
 - `api/pages/regression.html`: the complete simulator page.

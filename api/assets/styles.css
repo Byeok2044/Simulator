@@ -487,6 +487,39 @@ td input[type="text"] {
     padding: clamp(24px, 4vw, 45px) clamp(12px, 2vw, 24px) clamp(20px, 3.5vw, 35px); 
 }
 
+.results-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 12px 0;
+}
+
+.results-tabs [aria-selected="true"] {
+    background: var(--mid);
+    color: #fff;
+}
+
+#results-explanation {
+    text-align: center;
+}
+
+#results-explanation .btn-primary {
+    height: auto;
+    min-height: 40px;
+    max-width: 100%;
+    padding: 8px 12px;
+    line-height: 1.3;
+}
+
+.explanation-text {
+    max-width: 66ch;
+    margin: 16px auto 0;
+    text-align: left;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
 /* ================= RESULTS: HERO BANNER & 4-COLUMN GRID ================= */
 .equation-card {
     max-width: 720px;

@@ -4,9 +4,40 @@ header('Content-Type: application/javascript; charset=UTF-8');
 'use strict';
 (() => {
     const pageSize = 100;
+    function bindResultTabs(form) {
+        const tablist = form.querySelector('.results-tabs');
+        if (!tablist) return;
+        const tabs = [...tablist.querySelectorAll('[role="tab"]')];
+        const panels = tabs.map(tab => form.querySelector('#' + tab.getAttribute('aria-controls')));
+        function select(index) {
+            tabs.forEach((tab, i) => {
+                const active = i === index;
+                tab.setAttribute('aria-selected', String(active));
+                tab.tabIndex = active ? 0 : -1;
+                panels[i].hidden = !active;
+            });
+        }
+        tabs.forEach((tab, i) => {
+            panels[i].setAttribute('role', 'tabpanel');
+            panels[i].setAttribute('aria-labelledby', tab.id);
+            panels[i].tabIndex = 0;
+            tab.addEventListener('click', () => select(i));
+            tab.addEventListener('keydown', event => {
+                const next = { ArrowLeft: 1 - i, ArrowRight: 1 - i, Home: 0, End: 1 }[event.key];
+                if (next === undefined) return;
+                event.preventDefault();
+                select(next);
+                tabs[next].focus();
+            });
+        });
+        select(tablist.dataset.resultsTab === 'explanation' ? 1 : 0);
+        tablist.hidden = false;
+    }
+
     function bindForm() {
         const form = document.getElementById('regression-form');
         if (!form) return;
+        bindResultTabs(form);
         const tbody = form.querySelector('#data-table tbody');
         const prototype = tbody.rows[0].cloneNode(true);
         const points = form.elements.namedItem('points');
@@ -183,7 +214,9 @@ header('Content-Type: application/javascript; charset=UTF-8');
             busy = true;
             form.setAttribute('aria-busy', 'true');
             controls.forEach(([control]) => { control.disabled = true; });
-            status(action === 'import_csv' ? 'Importing CSV…' : 'Updating…');
+            const feedback = action === 'explain' ? form.querySelector('.explanation-feedback') : null;
+            if (feedback) feedback.textContent = 'Generating explanation…';
+            else status(action === 'import_csv' ? 'Importing CSV…' : 'Updating…');
             try {
                 const response = await fetch(form.action, { method: 'POST', body: data });
                 if (!response.ok) throw new Error('Request failed');
@@ -197,12 +230,14 @@ header('Content-Type: application/javascript; charset=UTF-8');
                     details.open = openSections.includes(details.querySelector('summary').textContent);
                 });
                 const replacement = updated.querySelector(`button[value="${action}"]`);
-                if (replacement && !replacement.disabled) replacement.focus({ preventScroll: true });
+                const focusTarget = action === 'explain' ? updated.querySelector('.explanation-text') ?? replacement : replacement;
+                if (focusTarget && !focusTarget.disabled) focusTarget.focus({ preventScroll: true });
                 window.scrollTo(0, scrollY);
                 const error = updated.querySelector('[role="alert"]');
                 if (error) { error.tabIndex = -1; error.focus(); }
             } catch {
-                status('Could not update. Your data is still here; please try again.');
+                if (feedback) feedback.textContent = 'Could not generate an explanation. Please try again.';
+                else status('Could not update. Your data is still here; please try again.');
             } finally {
                 busy = false;
                 form.removeAttribute('aria-busy');
@@ -217,4 +252,3 @@ header('Content-Type: application/javascript; charset=UTF-8');
     }
     bindForm();
 })();
-    

@@ -130,7 +130,11 @@
         <!-- ===== RESULTS CARD ===== -->
         <section class="card" data-model-result>
             <div class="card-header"><h2>Results</h2></div>
-            <div class="card-body results-body">
+            <div class="results-tabs" role="tablist" aria-label="Results" data-results-tab="{{active_results_tab}}" hidden>
+                <button type="button" role="tab" id="tab-overview" aria-controls="results-overview">Overview</button>
+                <button type="button" role="tab" id="tab-explanation" aria-controls="results-explanation">Explanation</button>
+            </div>
+            <div class="card-body results-body" id="results-overview">
                 <!-- Dedicated Equation Hero Card -->
                 <div class="equation-card">
                     <span class="equation-label">Regression Equation</span>
@@ -231,6 +235,19 @@
                     </div>
                     <output class="prediction {{prediction_class}}">{{prediction}}</output>
                 </details>
+            </div>
+            <div class="card-body results-body" id="results-explanation">
+                <h3>AI explanation</h3>
+                <p>Get a plain-language summary of the regression results. Only summary statistics are sent to Gemini.</p>
+                <button type="submit" name="action" value="explain" class="btn-primary">Generate Explanation</button>
+                <div class="explanation-feedback" aria-live="polite">
+                    <!-- IF explanation -->
+                    <p class="explanation-text" tabindex="-1">{{explanation}}</p>
+                    <!-- END explanation -->
+                    <!-- IF explanation_error -->
+                    <p role="alert">{{explanation_error}}</p>
+                    <!-- END explanation_error -->
+                </div>
             </div>
         </section>
 
